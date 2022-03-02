@@ -5,9 +5,13 @@ import NavDropdown from './NavDropdown';
 import NavItem from './NavItem';
 import NavList from './NavList';
 import NavListToggle from './NavListToggle';
-import { breakpoint, color, typography } from '../../../../style';
+import { color, typography } from '../../../../style';
 
-const Nav = styled.nav`
+type NavProps = {
+  fontSizeBreakpoint: string;
+}
+
+const Nav = styled.nav<NavProps>`
   display: flex;
 
   a {
@@ -31,7 +35,7 @@ const Nav = styled.nav`
     line-height: ${typography.lineHeight.h5.xs};
     list-style: none;
 
-    @media (min-width: ${breakpoint.md}) {
+    @media (min-width: ${props => props.fontSizeBreakpoint}) {
       font-size: ${typography.fontSize.body.xs};
       line-height: ${typography.lineHeight.body.xs};
     }
@@ -40,9 +44,10 @@ const Nav = styled.nav`
 
 type Props = {
   className?: string;
+  toggleBreakpoint: string;
 };
 
-const Navigation: React.FC<Props> = ({ className }) => {
+const Navigation: React.FC<Props> = ({ className, toggleBreakpoint }) => {
   const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
   const [headerHeight, setHeaderHeight] = useState<number>(60);
   const [navListIsHiding, setNavListIsHiding] = useState(false);
@@ -53,8 +58,9 @@ const Navigation: React.FC<Props> = ({ className }) => {
   useEffect(() => suppressScroll(navListIsShown), [navListIsShown]);
 
   return (
-    <Nav className={className} id="navigation">
+    <Nav className={className} id="navigation" fontSizeBreakpoint={toggleBreakpoint}>
       <NavListToggle
+        displayBreakpoint={toggleBreakpoint}
         navListIsShown={navListIsShown}
         setNavListIsHiding={setNavListIsHiding}
         setNavListIsShown={setNavListIsShown}
@@ -62,32 +68,35 @@ const Navigation: React.FC<Props> = ({ className }) => {
       <NavList
         className={`${navListIsShown && 'show'} ${navListIsHiding && 'hiding'}`}
         headerHeight={headerHeight}
+        layoutBreakpoint={toggleBreakpoint}
       >
-        <NavItem to="/">Home</NavItem>
-        <NavItem to="/events">Events</NavItem>
-        <NavItem to="/services">Services</NavItem>
+        <NavItem layoutBreakpoint={toggleBreakpoint} to="/">Home</NavItem>
+        <NavItem layoutBreakpoint={toggleBreakpoint} to="/events">Events</NavItem>
+        <NavItem layoutBreakpoint={toggleBreakpoint} to="/services">Services</NavItem>
         <NavDropdown
           dropdownListIsShown={activeDropdownId === 'more-dropdown'}
           id="more-dropdown"
+          layoutBreakpoint={toggleBreakpoint}
           setActiveDropdownId={setActiveDropdownId}
           title="More"
         >
-          <NavItem to="/images">Images</NavItem>
-          <NavItem to="/mission">Mission</NavItem>
+          <NavItem layoutBreakpoint={toggleBreakpoint} to="/images">Images</NavItem>
+          <NavItem layoutBreakpoint={toggleBreakpoint} to="/mission">Mission</NavItem>
         </NavDropdown>
         <NavDropdown
           dropdownListIsShown={activeDropdownId === 'about-dropdown'}
           id="about-dropdown"
+          layoutBreakpoint={toggleBreakpoint}
           setActiveDropdownId={setActiveDropdownId}
           title="About"
         >
-          <NavItem to="/about">Who we are</NavItem>
-          <NavItem to="/about/belief">What we believe</NavItem>
-          <NavItem to="/about/pastor">Pastor’s message</NavItem>
-          <NavItem to="/about/team">Our team</NavItem>
+          <NavItem layoutBreakpoint={toggleBreakpoint} to="/about">Who we are</NavItem>
+          <NavItem layoutBreakpoint={toggleBreakpoint} to="/about/belief">What we believe</NavItem>
+          <NavItem layoutBreakpoint={toggleBreakpoint} to="/about/pastor">Pastor’s message</NavItem>
+          <NavItem layoutBreakpoint={toggleBreakpoint} to="/about/team">Our team</NavItem>
         </NavDropdown>
-        <NavItem to="/visit">Visit</NavItem>
-        <NavItem to="/contact">Contact</NavItem>
+        <NavItem layoutBreakpoint={toggleBreakpoint} to="/visit">Visit</NavItem>
+        <NavItem layoutBreakpoint={toggleBreakpoint} to="/contact">Contact</NavItem>
       </NavList>
     </Nav>
   );

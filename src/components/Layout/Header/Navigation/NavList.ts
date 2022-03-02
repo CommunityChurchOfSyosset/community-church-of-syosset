@@ -1,9 +1,10 @@
 import styled from 'styled-components';
 
-import { breakpoint, color } from '../../../../style';
+import { color } from '../../../../style';
 
 type Props = {
   headerHeight: number;
+  layoutBreakpoint: string;
 };
 
 const NavList = styled.ul<Props>`
@@ -31,7 +32,7 @@ const NavList = styled.ul<Props>`
     visibility: visible;
   }
 
-  @media (min-width: ${breakpoint.md}) {
+  @media (min-width: ${props => props.layoutBreakpoint}) {
     background: none;
     display: flex;
     height: auto;

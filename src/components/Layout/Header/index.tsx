@@ -4,15 +4,19 @@ import styled from 'styled-components';
 import Brand from './Brand';
 import Navigation from './Navigation';
 import CCSLogo from '../../CCSLogo';
-import { baseline, breakpoint, color } from '../../../style';
+import { baseline, color } from '../../../style';
 
-const Container = styled.header`
+type ContainerProps = {
+  paddingBreakpoint: string;
+}
+
+const Container = styled.header<ContainerProps>`
   background-color: ${color.white};
   display: flex;
   justify-content: space-between;
   padding: calc(3 * ${baseline});
 
-  @media (min-width: ${breakpoint.md}) {
+  @media (min-width: ${props => props.paddingBreakpoint}) {
     padding: 0;
   }
 `;
@@ -26,14 +30,15 @@ const StyledCCSLogo = styled(CCSLogo)`
 
 type Props = {
   className?: string;
+  layoutBreakpoint: string;
 };
 
-const Header: React.FC<Props> = ({ className }) => (
-  <Container className={className}>
-    <StyledBrand>
+const Header: React.FC<Props> = ({ className, layoutBreakpoint }) => (
+  <Container className={className} paddingBreakpoint={layoutBreakpoint}>
+    <StyledBrand layoutBreakpoint={layoutBreakpoint}>
       <StyledCCSLogo />
     </StyledBrand>
-    <Navigation />
+    <Navigation toggleBreakpoint={layoutBreakpoint} />
   </Container>
 );
 

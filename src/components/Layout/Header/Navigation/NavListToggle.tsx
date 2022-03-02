@@ -2,9 +2,13 @@ import React from 'react';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { breakpoint, color, typography } from '../../../../style';
+import { color, typography } from '../../../../style';
 
-const Button = styled.button`
+type ButtonProps = {
+  displayBreakpoint: string;
+}
+
+const Button = styled.button<ButtonProps>`
   background: none;
   border: none;
   font-size: ${typography.fontSize.h1.xs};
@@ -20,23 +24,25 @@ const Button = styled.button`
     cursor: pointer;
   }
 
-  @media (min-width: ${breakpoint.md}) {
+  @media (min-width: ${props => props.displayBreakpoint}) {
     display: none;
   }
 `;
 
 type Props = {
+  displayBreakpoint: string;
   navListIsShown: boolean;
   setNavListIsHiding: React.Dispatch<React.SetStateAction<boolean>>;
   setNavListIsShown: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const NavListToggle: React.FC<Props> = ({
+  displayBreakpoint,
   navListIsShown,
   setNavListIsHiding,
   setNavListIsShown,
 }) => (
-  <Button>
+  <Button displayBreakpoint={displayBreakpoint}>
     <FontAwesomeIcon
       color={color.body}
       icon={navListIsShown ? 'times' : 'bars'}

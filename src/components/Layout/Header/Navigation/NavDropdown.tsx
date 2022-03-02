@@ -2,11 +2,12 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { baseline, breakpoint, color } from '../../../../style';
+import { baseline, color } from '../../../../style';
 
 type ButtonProps = {
   childIsActive: boolean;
   dropdownListIsShown: boolean;
+  layoutBreakpoint: string;
 };
 
 const Button = styled.button<ButtonProps>`
@@ -39,12 +40,12 @@ const Button = styled.button<ButtonProps>`
 
   && {
     color: ${props =>
-      props.childIsActive || props.dropdownListIsShown
-        ? color.white
-        : 'inherit'};
+    props.childIsActive || props.dropdownListIsShown
+      ? color.white
+      : 'inherit'};
   }
 
-  @media (min-width: ${breakpoint.md}) {
+  @media (min-width: ${props => props.layoutBreakpoint}) {
     height: 100%;
     justify-content: center;
     padding: calc(3 * ${baseline});
@@ -54,6 +55,7 @@ const Button = styled.button<ButtonProps>`
 type DropdownListProps = {
   height: number;
   isShown: boolean;
+  layoutBreakpoint: string;
 };
 
 const DropdownList = styled.ul<DropdownListProps>`
@@ -90,17 +92,21 @@ const DropdownList = styled.ul<DropdownListProps>`
     visibility: visible;
   }
 
-  @media (min-width: ${breakpoint.md}) {
+  @media (min-width: ${props => props.layoutBreakpoint}) {
     box-shadow: 0 0 5px ${color.black};
     position: absolute;
     z-index: -1;
   }
 `;
 
-const ListItem = styled.li`
+type ListItemProps = {
+  borderBreakpoint: string;
+}
+
+const ListItem = styled.li<ListItemProps>`
   border-top: 1px solid ${color.body};
 
-  @media (min-width: ${breakpoint.md}) {
+  @media (min-width: ${props => props.borderBreakpoint}) {
     border-top: 0;
   }
 `;
@@ -114,6 +120,7 @@ type Props = {
   className?: string;
   dropdownListIsShown: boolean;
   id: string;
+  layoutBreakpoint: string;
   setActiveDropdownId: React.Dispatch<React.SetStateAction<string | null>>;
   title: string;
 };
@@ -123,6 +130,7 @@ const NavDropdown: React.FC<Props> = ({
   className,
   dropdownListIsShown,
   id,
+  layoutBreakpoint,
   setActiveDropdownId,
   title,
 }) => {
@@ -134,10 +142,11 @@ const NavDropdown: React.FC<Props> = ({
   useEffect(() => setListHeightAndlistenForWindowResize(setListHeight, id), []);
 
   return (
-    <ListItem className={className}>
+    <ListItem borderBreakpoint={layoutBreakpoint} className={className} >
       <Button
         childIsActive={childIsActive}
         dropdownListIsShown={dropdownListIsShown}
+        layoutBreakpoint={layoutBreakpoint}
         onClick={() =>
           handleClick(
             dropdownListIsShown,
@@ -160,6 +169,7 @@ const NavDropdown: React.FC<Props> = ({
         height={listHeight}
         id={id}
         isShown={dropdownListIsShown}
+        layoutBreakpoint={layoutBreakpoint}
       >
         {children}
       </DropdownList>

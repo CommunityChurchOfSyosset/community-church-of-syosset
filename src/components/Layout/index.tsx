@@ -9,7 +9,7 @@ import Body from './Body';
 import Footer from './Footer';
 import GlobalStyle from './GlobalStyle';
 import Header from './Header';
-import { color } from '../../style';
+import { breakpoint, color } from '../../style';
 import '../../icon-library';
 
 fontAwesomeConfig.autoAddCss = false;
@@ -113,7 +113,7 @@ const Layout: React.FC<Props> = ({
     <>
       <GlobalStyle />
       <Container className={className}>
-        <StyledHeader />
+        <StyledHeader layoutBreakpoint={breakpoint.lg} />
         <StyledBody
           backgroundImage={backgroundImage}
           backgroundVideoOverlay={backgroundVideoOverlay}

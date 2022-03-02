@@ -2,17 +2,25 @@ import { Link } from 'gatsby';
 import React from 'react';
 import styled from 'styled-components';
 
-import { baseline, breakpoint, color } from '../../../../style';
+import { baseline, color } from '../../../../style';
 
-const ListItem = styled.li`
+type ListItemProps = {
+  borderBreakpoint: string;
+}
+
+const ListItem = styled.li<ListItemProps>`
   border-top: 1px solid ${color.body};
 
-  @media (min-width: ${breakpoint.md}) {
+  @media (min-width: ${props => props.borderBreakpoint}) {
     border-top: 0;
   }
 `;
 
-const StyledLink = styled(Link)`
+type StyledLinkProps = {
+  layoutBreakpoint: string;
+}
+
+const StyledLink = styled(Link) <StyledLinkProps>`
   background-color: ${color.white};
   display: block;
   padding: calc(2 * ${baseline});
@@ -22,7 +30,7 @@ const StyledLink = styled(Link)`
     color: ${color.white};
   }
 
-  @media (min-width: ${breakpoint.md}) {
+  @media (min-width: ${props => props.layoutBreakpoint}) {
     align-items: center;
     display: flex;
     height: 100%;
@@ -33,12 +41,13 @@ const StyledLink = styled(Link)`
 type Props = {
   children: React.ReactNode;
   className?: string;
+  layoutBreakpoint: string;
   to: string;
 };
 
-const NavItem: React.FC<Props> = ({ children, className, to }) => (
-  <ListItem className={className}>
-    <StyledLink activeClassName="active" to={to}>
+const NavItem: React.FC<Props> = ({ children, className, layoutBreakpoint, to }) => (
+  <ListItem borderBreakpoint={layoutBreakpoint} className={className}>
+    <StyledLink activeClassName="active" layoutBreakpoint={layoutBreakpoint} to={to}>
       {children}
     </StyledLink>
   </ListItem>
