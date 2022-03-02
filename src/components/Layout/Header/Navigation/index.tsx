@@ -73,16 +73,8 @@ const Navigation: React.FC<Props> = ({ className, toggleBreakpoint }) => {
         <NavItem layoutBreakpoint={toggleBreakpoint} to="/">Home</NavItem>
         <NavItem layoutBreakpoint={toggleBreakpoint} to="/events">Events</NavItem>
         <NavItem layoutBreakpoint={toggleBreakpoint} to="/services">Services</NavItem>
-        <NavDropdown
-          dropdownListIsShown={activeDropdownId === 'more-dropdown'}
-          id="more-dropdown"
-          layoutBreakpoint={toggleBreakpoint}
-          setActiveDropdownId={setActiveDropdownId}
-          title="More"
-        >
-          <NavItem layoutBreakpoint={toggleBreakpoint} to="/images">Images</NavItem>
-          <NavItem layoutBreakpoint={toggleBreakpoint} to="/mission">Mission</NavItem>
-        </NavDropdown>
+        <NavItem layoutBreakpoint={toggleBreakpoint} to="/images">Images</NavItem>
+        <NavItem layoutBreakpoint={toggleBreakpoint} to="/mission">Mission</NavItem>
         <NavDropdown
           dropdownListIsShown={activeDropdownId === 'about-dropdown'}
           id="about-dropdown"
