@@ -98,7 +98,7 @@ const HomePage: React.FC = () => {
 
   const backgroundImageStack = data.backgroundImage
     ? [
-        'linear-gradient(rgba(0, 191, 255, 0.65), rgba(0, 191, 255, 0.65))',
+        'linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5))',
         data.backgroundImage.fluid,
       ]
     : ['linear-gradient(rgba(0, 191, 255, 1), rgba(0, 191, 255, 1))'];
@@ -116,7 +116,7 @@ const HomePage: React.FC = () => {
       )}
       <StyledLayout
         backgroundImage={backgroundImageStack}
-        backgroundVideoOverlay="rgba(0, 191, 255, 0.65)"
+        backgroundVideoOverlay="rgba(0, 0, 0, 0.5)"
         backgroundVideoUrl={
           data.backgroundVideo && data.backgroundVideo.file.url
         }
