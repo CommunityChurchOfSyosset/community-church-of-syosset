@@ -4,6 +4,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 import CenteredTextColumn from '../components/CenteredTextColumn';
+import ExternalLink from '../components/ExternalLink';
 import Layout from '../components/Layout';
 import Lead from '../components/Lead';
 import MissionCardList from '../components/MissionCardList';
@@ -68,12 +69,32 @@ const MissionPage: React.FC = () => {
             We are called to care for our local community and the world.
           </Lead>
           <p>
-            Ten percent of the church’s income is pledged for mission outreach.
-            Those funds are split between local missions and missions within the
-            United Church of Christ. Special offerings are taken for emergent
-            mission work that is brought to our attention each year.
+            Jesus said,{' '}
+            <q cite="https://www.biblegateway.com/verse/en/Matthew%2025:40">
+              …whatever you did for one of the least of these, you did for me.
+            </q>{' '}
+            (
+            <ExternalLink href="https://www.biblegateway.com/verse/en/Matthew%2025:40">
+              Matt. 25:40
+            </ExternalLink>
+            ) We are taught to love others as he has loved us, so our mission is
+            outreach or sharing Christ’s love and making a difference in the
+            world.
           </p>
-          <p>Click on a mission to learn more about it.</p>
+          <p>
+            As our Red Bucket refills each week, we share the bounty with the
+            Long Island Council of Churches for distribution to food pantries
+            and those in need on Long Island. Additionally, we support justice
+            and peace locally and throughout the world by supporting educational
+            and social programs of the United Church of Christ such as Church’s
+            Wider Mission, One Great Hour of Sharing, Strengthen the Church,
+            Neighbors in Need, the Christmas Fund and UCC Coalition.
+          </p>
+          <p>
+            Our mission in 2021 supported as well the following important
+            resources for our neighbors and our world to create a better future
+            for all.
+          </p>
         </CenteredTextColumn>
         {missions.length > 0 ? (
           <StyledMissionCardList missions={missions} />
