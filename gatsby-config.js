@@ -2,6 +2,7 @@ require('dotenv').config();
 
 module.exports = {
   plugins: [
+    'gatsby-plugin-fontawesome-css',
     {
       resolve: 'gatsby-plugin-manifest',
       options: {
