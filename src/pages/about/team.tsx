@@ -1,5 +1,4 @@
 import { graphql, useStaticQuery } from 'gatsby';
-import { FixedObject } from 'gatsby-image';
 import React from 'react';
 import styled from 'styled-components';
 
@@ -7,43 +6,41 @@ import CenteredTextColumn from '../../components/CenteredTextColumn';
 import Layout from '../../components/Layout';
 import Lead from '../../components/Lead';
 import SEO from '../../components/SEO';
-import TeamMemberCardList from '../../components/TeamMemberCardList';
+import TeamMemberCardList, {
+  Props as TeamMemberCardListProps,
+} from '../../components/TeamMemberCardList';
 import { baseline } from '../../style';
 
 const StyledTeamMemberCardList = styled(TeamMemberCardList)`
   margin: 0 auto calc(6 * ${baseline});
 `;
 
-type Data = {
-  contentfulContentList: {
-    items: {
-      id: string;
-      image?: {
-        description?: string;
-        fixed: FixedObject;
-      };
-      name: string;
-      role: string;
-      slug: string;
-    }[];
+interface Data {
+  readonly contentfulContentList: {
+    readonly items: TeamMemberCardListProps['teamMembers'];
   };
-};
+}
 
-const TeamPage: React.FC = () => {
+export default function TeamPage() {
   const data = useStaticQuery<Data>(graphql`
     query TeamPage {
       contentfulContentList(title: { eq: "Staff List" }) {
         items {
-          id
-          image {
-            description
-            fixed(height: 272, width: 272) {
-              ...GatsbyContentfulFixed
+          ... on ContentfulPerson {
+            id
+            image {
+              description
+              gatsbyImageData(
+                height: 272
+                layout: FIXED
+                quality: 100
+                width: 272
+              )
             }
+            name
+            role
+            slug
           }
-          name
-          role
-          slug
         }
       }
     }
@@ -67,6 +64,4 @@ const TeamPage: React.FC = () => {
       </Layout>
     </>
   );
-};
-
-export default TeamPage;
+}

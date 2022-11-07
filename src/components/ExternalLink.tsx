@@ -1,27 +1,22 @@
 import React from 'react';
 
-type Props = {
-  children: React.ReactNode;
-  className?: string;
-  download?: boolean;
-  href: string;
-};
+export interface Props {
+  readonly children: React.ReactNode;
+  readonly className?: string;
+  readonly download?: boolean;
+  readonly href: string;
+}
 
-const ExternalLink: React.FC<Props> = ({
-  children,
-  className,
-  download,
-  href,
-}) => (
-  <a
-    className={className}
-    download={download}
-    href={href}
-    rel="noopener noreferrer"
-    target="_blank"
-  >
-    {children}
-  </a>
-);
-
-export default ExternalLink;
+export default function ExternalLink(props: Props) {
+  return (
+    <a
+      className={props.className}
+      download={props.download}
+      href={props.href}
+      rel="noopener noreferrer"
+      target="_blank"
+    >
+      {props.children}
+    </a>
+  );
+}

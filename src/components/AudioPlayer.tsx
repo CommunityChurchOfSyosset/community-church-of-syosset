@@ -2,22 +2,36 @@ import React from 'react';
 
 import ExternalLink from '../components/ExternalLink';
 
-type Props = {
-  className?: string;
-  url: string;
-};
+export interface Props {
+  readonly className?: string;
+  readonly url: string;
+}
 
-const AudioPlayer: React.FC<Props> = ({ className, url }) => (
-  <audio className={className} controls preload="metadata" src={url}>
+export default function AudioPlayer(props: Props) {
+  return (
+    <audio
+      className={props.className}
+      controls
+      preload="metadata"
+      src={props.url}
+    >
+      <Fallback url={props.url} />
+    </audio>
+  );
+}
+
+interface FallbackProps {
+  readonly url: string;
+}
+
+function Fallback(props: FallbackProps) {
+  return (
     <p>
-      Your browser does not support the HTML5
-      <code>audio</code> element.{' '}
-      <ExternalLink download href={url}>
+      Your browser does not support the HTML5 <code>audio</code> element.{' '}
+      <ExternalLink download href={props.url}>
         Click here to download this audio
       </ExternalLink>
       .
     </p>
-  </audio>
-);
-
-export default AudioPlayer;
+  );
+}

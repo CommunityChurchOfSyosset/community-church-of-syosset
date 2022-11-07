@@ -1,8 +1,9 @@
-import { FixedObject } from 'gatsby-image';
 import React from 'react';
 import styled from 'styled-components';
 
-import TeamMemberCard from '../components/TeamMemberCard';
+import TeamMemberCard, {
+  Props as TeamMemberCardProps,
+} from '../components/TeamMemberCard';
 import { baseline, breakpoint, color } from '../style';
 
 const StyledTeamMemberCard = styled(TeamMemberCard)`
@@ -26,22 +27,19 @@ const UnorderedList = styled.ul`
   }
 `;
 
-export type Props = {
-  className?: string;
-  teamMembers: {
-    id: string;
-    image?: {
-      description?: string;
-      fixed: FixedObject;
-    };
-    name: string;
-    role: string;
-    slug: string;
+export interface Props {
+  readonly className?: string;
+  readonly teamMembers: {
+    readonly id: string;
+    readonly image: TeamMemberCardProps['image'];
+    readonly name: string;
+    readonly role: string;
+    readonly slug: string;
   }[];
-};
+}
 
-const TeamMemberCardList: React.FC<Props> = ({ className, teamMembers }) => {
-  const teamMemberCards = teamMembers.map(teamMember => (
+export default function TeamMemberCardList(props: Props) {
+  const teamMemberCards = props.teamMembers.map(teamMember => (
     <li key={teamMember.id}>
       <StyledTeamMemberCard
         image={teamMember.image}
@@ -52,7 +50,7 @@ const TeamMemberCardList: React.FC<Props> = ({ className, teamMembers }) => {
     </li>
   ));
 
-  return <UnorderedList className={className}>{teamMemberCards}</UnorderedList>;
-};
-
-export default TeamMemberCardList;
+  return (
+    <UnorderedList className={props.className}>{teamMemberCards}</UnorderedList>
+  );
+}

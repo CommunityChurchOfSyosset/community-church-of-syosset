@@ -1,10 +1,9 @@
 import { Link } from 'gatsby';
-import { FixedObject } from 'gatsby-image';
 import React from 'react';
 import styled from 'styled-components';
 
 import Card from './Card';
-import FixedImage from './FixedImage';
+import FixedImage, { Props as FixedImageProps } from './FixedImage';
 import { baseline } from '../style';
 
 const Details = styled.p`
@@ -27,35 +26,27 @@ const StyledLink = styled(Link)`
   }
 `;
 
-type Props = {
-  className?: string;
-  image?: {
-    description?: string;
-    fixed: FixedObject;
-  };
-  slug: string;
-  title: string;
-};
+export interface Props {
+  readonly className?: string;
+  readonly image: FixedImageProps['image'];
+  readonly slug: string;
+  readonly title: string;
+}
 
-const ImageGalleryCard: React.FC<Props> = ({
-  className,
-  image,
-  slug,
-  title,
-}) => (
-  <Card className={className}>
-    <StyledLink to={`/images/${slug}`}>
-      <StyledFixedImage
-        image={image}
-        imageWrapperStyle={{ display: 'block' }}
-        placeholderIcon="images"
-        placeholderIconSize={`calc(54 * ${baseline})`}
-      />
-      <Details>
-        <b>{title}</b>
-      </Details>
-    </StyledLink>
-  </Card>
-);
-
-export default ImageGalleryCard;
+export default function ImageGalleryCard(props: Props) {
+  return (
+    <Card className={props.className}>
+      <StyledLink to={`/images/${props.slug}`}>
+        <StyledFixedImage
+          image={props.image}
+          imageWrapperStyle={{ display: 'block' }}
+          placeholderIcon="images"
+          placeholderIconSize={`calc(54 * ${baseline})`}
+        />
+        <Details>
+          <b>{props.title}</b>
+        </Details>
+      </StyledLink>
+    </Card>
+  );
+}

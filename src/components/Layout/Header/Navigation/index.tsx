@@ -7,8 +7,8 @@ import NavList from './NavList';
 import NavListToggle from './NavListToggle';
 import { color, typography } from '../../../../style';
 
-type NavProps = {
-  fontSizeBreakpoint: string;
+interface NavProps {
+  readonly fontSizeBreakpoint: string;
 }
 
 const Nav = styled.nav<NavProps>`
@@ -42,25 +42,28 @@ const Nav = styled.nav<NavProps>`
   }
 `;
 
-type Props = {
-  className?: string;
-  toggleBreakpoint: string;
-};
+export interface Props {
+  readonly className?: string;
+  readonly toggleBreakpoint: string;
+}
 
-const Navigation: React.FC<Props> = ({ className, toggleBreakpoint }) => {
+export default function Navigation(props: Props) {
   const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
   const [headerHeight, setHeaderHeight] = useState<number>(60);
   const [navListIsHiding, setNavListIsHiding] = useState(false);
   const [navListIsShown, setNavListIsShown] = useState(false);
-
   useEffect(() => getAndSetHeaderHeight(setHeaderHeight), []);
   useEffect(() => listenForAndHandleDocumentClick(setActiveDropdownId), []);
   useEffect(() => suppressScroll(navListIsShown), [navListIsShown]);
 
   return (
-    <Nav className={className} id="navigation" fontSizeBreakpoint={toggleBreakpoint}>
+    <Nav
+      className={props.className}
+      id="navigation"
+      fontSizeBreakpoint={props.toggleBreakpoint}
+    >
       <NavListToggle
-        displayBreakpoint={toggleBreakpoint}
+        displayBreakpoint={props.toggleBreakpoint}
         navListIsShown={navListIsShown}
         setNavListIsHiding={setNavListIsHiding}
         setNavListIsShown={setNavListIsShown}
@@ -68,33 +71,56 @@ const Navigation: React.FC<Props> = ({ className, toggleBreakpoint }) => {
       <NavList
         className={`${navListIsShown && 'show'} ${navListIsHiding && 'hiding'}`}
         headerHeight={headerHeight}
-        layoutBreakpoint={toggleBreakpoint}
+        layoutBreakpoint={props.toggleBreakpoint}
       >
-        <NavItem layoutBreakpoint={toggleBreakpoint} to="/">Home</NavItem>
-        <NavItem layoutBreakpoint={toggleBreakpoint} to="/events">Events</NavItem>
-        <NavItem layoutBreakpoint={toggleBreakpoint} to="/services">Services</NavItem>
-        <NavItem layoutBreakpoint={toggleBreakpoint} to="/images">Images</NavItem>
-        <NavItem layoutBreakpoint={toggleBreakpoint} to="/mission">Mission</NavItem>
+        <NavItem layoutBreakpoint={props.toggleBreakpoint} to="/">
+          Home
+        </NavItem>
+        <NavItem layoutBreakpoint={props.toggleBreakpoint} to="/events">
+          Events
+        </NavItem>
+        <NavItem layoutBreakpoint={props.toggleBreakpoint} to="/services">
+          Services
+        </NavItem>
+        <NavItem layoutBreakpoint={props.toggleBreakpoint} to="/images">
+          Images
+        </NavItem>
+        <NavItem layoutBreakpoint={props.toggleBreakpoint} to="/mission">
+          Mission
+        </NavItem>
+        <NavItem layoutBreakpoint={props.toggleBreakpoint} to="/outreach">
+          Outreach
+        </NavItem>
         <NavDropdown
           dropdownListIsShown={activeDropdownId === 'about-dropdown'}
           id="about-dropdown"
-          layoutBreakpoint={toggleBreakpoint}
+          layoutBreakpoint={props.toggleBreakpoint}
           setActiveDropdownId={setActiveDropdownId}
           title="About"
         >
-          <NavItem layoutBreakpoint={toggleBreakpoint} to="/about">Who we are</NavItem>
-          <NavItem layoutBreakpoint={toggleBreakpoint} to="/about/belief">What we believe</NavItem>
-          <NavItem layoutBreakpoint={toggleBreakpoint} to="/about/pastor">Pastor’s message</NavItem>
-          <NavItem layoutBreakpoint={toggleBreakpoint} to="/about/team">Our team</NavItem>
+          <NavItem layoutBreakpoint={props.toggleBreakpoint} to="/about">
+            Who we are
+          </NavItem>
+          <NavItem layoutBreakpoint={props.toggleBreakpoint} to="/about/belief">
+            What we believe
+          </NavItem>
+          <NavItem layoutBreakpoint={props.toggleBreakpoint} to="/about/pastor">
+            Pastor’s message
+          </NavItem>
+          <NavItem layoutBreakpoint={props.toggleBreakpoint} to="/about/team">
+            Our team
+          </NavItem>
         </NavDropdown>
-        <NavItem layoutBreakpoint={toggleBreakpoint} to="/visit">Visit</NavItem>
-        <NavItem layoutBreakpoint={toggleBreakpoint} to="/contact">Contact</NavItem>
+        <NavItem layoutBreakpoint={props.toggleBreakpoint} to="/visit">
+          Visit
+        </NavItem>
+        <NavItem layoutBreakpoint={props.toggleBreakpoint} to="/contact">
+          Contact
+        </NavItem>
       </NavList>
     </Nav>
   );
-};
-
-export default Navigation;
+}
 
 function getAndSetHeaderHeight(
   setHeaderHeight: React.Dispatch<React.SetStateAction<number>>
@@ -119,7 +145,6 @@ function listenForAndHandleDocumentClick(
     };
 
     document.addEventListener('click', handleDocumentClick);
-
     return () => document.removeEventListener('click', handleDocumentClick);
   }
 }

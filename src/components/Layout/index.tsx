@@ -1,11 +1,10 @@
 import { graphql, useStaticQuery } from 'gatsby';
-import { IFluidObject } from 'gatsby-background-image';
 import React from 'react';
 import styled from 'styled-components';
 import { config as fontAwesomeConfig } from '@fortawesome/fontawesome-svg-core';
 import '@fortawesome/fontawesome-svg-core/styles.css';
 
-import Body from './Body';
+import Body, { BackgroundImageStack } from './Body';
 import Footer from './Footer';
 import GlobalStyle from './GlobalStyle';
 import Header from './Header';
@@ -38,49 +37,42 @@ const StyledHeader = styled(Header)`
   z-index: 1;
 `;
 
-type Props = {
-  backgroundImage?: IFluidObject | IFluidObject[] | (IFluidObject | string)[];
-  backgroundVideoOverlay?: string;
-  backgroundVideoUrl?: string;
-  bodyDisplay?: string;
-  children: React.ReactNode;
-  className?: string;
-};
+export interface Props {
+  readonly backgroundImage?: BackgroundImageStack;
+  readonly backgroundVideoOverlay?: string;
+  readonly backgroundVideoUrl?: string;
+  readonly bodyDisplay?: string;
+  readonly children: React.ReactNode;
+  readonly className?: string;
+}
 
-type Data = {
-  contentfulJsonObject: {
-    json: {
-      copyright: {
-        holder: string;
-        initialYear: number;
+interface Data {
+  readonly contentfulJsonObject: {
+    readonly json: {
+      readonly copyright: {
+        readonly holder: string;
+        readonly initialYear: number;
       };
-      organization: {
-        address: {
-          city: string;
-          state: string;
-          street: string;
-          zip: string;
+      readonly organization: {
+        readonly address: {
+          readonly city: string;
+          readonly state: string;
+          readonly street: string;
+          readonly zip: string;
         };
-        name: string;
-        phone: string;
+        readonly name: string;
+        readonly phone: string;
       };
-      socialMedia: {
-        facebook: {
-          slug: string;
+      readonly socialMedia: {
+        readonly facebook: {
+          readonly slug: string;
         };
       };
     };
   };
-};
+}
 
-const Layout: React.FC<Props> = ({
-  backgroundImage,
-  backgroundVideoOverlay,
-  backgroundVideoUrl,
-  bodyDisplay,
-  children,
-  className,
-}) => {
+export default function Layout(props: Props) {
   const data = useStaticQuery<Data>(graphql`
     query LayoutComponent {
       contentfulJsonObject(title: { eq: "Website Data" }) {
@@ -112,15 +104,15 @@ const Layout: React.FC<Props> = ({
   return (
     <>
       <GlobalStyle />
-      <Container className={className}>
+      <Container className={props.className}>
         <StyledHeader layoutBreakpoint={breakpoint.lg} />
         <StyledBody
-          backgroundImage={backgroundImage}
-          backgroundVideoOverlay={backgroundVideoOverlay}
-          backgroundVideoUrl={backgroundVideoUrl}
-          display={bodyDisplay}
+          backgroundImage={props.backgroundImage}
+          backgroundVideoOverlay={props.backgroundVideoOverlay}
+          backgroundVideoUrl={props.backgroundVideoUrl}
+          display={props.bodyDisplay}
         >
-          {children}
+          {props.children}
         </StyledBody>
         <StyledFooter
           copyright={data.contentfulJsonObject.json.copyright}
@@ -130,6 +122,4 @@ const Layout: React.FC<Props> = ({
       </Container>
     </>
   );
-};
-
-export default Layout;
+}

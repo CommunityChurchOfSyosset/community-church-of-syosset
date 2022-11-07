@@ -1,10 +1,9 @@
 import { Link } from 'gatsby';
-import { FixedObject } from 'gatsby-image';
 import React from 'react';
 import styled from 'styled-components';
 
 import Card from './Card';
-import FixedImage from './FixedImage';
+import FixedImage, { Props as FixedImageProps } from './FixedImage';
 import { baseline } from '../style';
 
 const Details = styled.p`
@@ -27,38 +26,29 @@ const StyledLink = styled(Link)`
   }
 `;
 
-type Props = {
-  className?: string;
-  image?: {
-    description?: string;
-    fixed: FixedObject;
-  };
-  name: string;
-  role: string;
-  slug: string;
-};
+export interface Props {
+  readonly className?: string;
+  readonly image: FixedImageProps['image'];
+  readonly name: string;
+  readonly role: string;
+  readonly slug: string;
+}
 
-const TeamMemberCard: React.FC<Props> = ({
-  className,
-  image,
-  name,
-  role,
-  slug,
-}) => (
-  <Card className={className}>
-    <StyledLink to={`/people/${slug}`}>
-      <StyledFixedImage
-        image={image}
-        imageWrapperStyle={{ display: 'block' }}
-        placeholderIcon="user"
-        placeholderIconSize={`calc(62 * ${baseline})`}
-      />
-      <Details>
-        <b>{name}</b> <br />
-        {role}
-      </Details>
-    </StyledLink>
-  </Card>
-);
-
-export default TeamMemberCard;
+export default function TeamMemberCard(props: Props) {
+  return (
+    <Card className={props.className}>
+      <StyledLink to={`/people/${props.slug}`}>
+        <StyledFixedImage
+          image={props.image}
+          imageWrapperStyle={{ display: 'block' }}
+          placeholderIcon="user"
+          placeholderIconSize={`calc(62 * ${baseline})`}
+        />
+        <Details>
+          <b>{props.name}</b> <br />
+          {props.role}
+        </Details>
+      </StyledLink>
+    </Card>
+  );
+}

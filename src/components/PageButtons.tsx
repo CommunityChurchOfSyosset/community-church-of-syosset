@@ -28,39 +28,34 @@ const PrevLinkButton = styled(LinkButton)`
   margin-right: auto;
 `;
 
-type Props = {
-  className?: string;
-  nextSlug?: string;
-  prevSlug?: string;
-  rootSlug: string;
-};
+export interface Props {
+  readonly className?: string;
+  readonly nextSlug?: string;
+  readonly prevSlug?: string;
+  readonly rootSlug: string;
+}
 
-const PageButtons: React.FC<Props> = ({
-  className,
-  nextSlug,
-  prevSlug,
-  rootSlug,
-}) => (
-  <Container className={className}>
-    {prevSlug && (
-      <PrevLinkButton to={`/${rootSlug}/${prevSlug}`}>
-        <PrevIconContainer>
-          <FontAwesomeIcon icon="chevron-left" />
-          <FontAwesomeIcon icon="chevron-left" />
-        </PrevIconContainer>
-        Prev
-      </PrevLinkButton>
-    )}
-    {nextSlug && (
-      <NextLinkButton to={`/${rootSlug}/${nextSlug}`}>
-        Next
-        <NextIconContainer>
-          <FontAwesomeIcon icon="chevron-right" />
-          <FontAwesomeIcon icon="chevron-right" />
-        </NextIconContainer>
-      </NextLinkButton>
-    )}
-  </Container>
-);
-
-export default PageButtons;
+export default function PageButtons(props: Props) {
+  return (
+    <Container className={props.className}>
+      {props.prevSlug && (
+        <PrevLinkButton to={`/${props.rootSlug}/${props.prevSlug}`}>
+          <PrevIconContainer>
+            <FontAwesomeIcon icon="chevron-left" />
+            <FontAwesomeIcon icon="chevron-left" />
+          </PrevIconContainer>
+          Prev
+        </PrevLinkButton>
+      )}
+      {props.nextSlug && (
+        <NextLinkButton to={`/${props.rootSlug}/${props.nextSlug}`}>
+          Next
+          <NextIconContainer>
+            <FontAwesomeIcon icon="chevron-right" />
+            <FontAwesomeIcon icon="chevron-right" />
+          </NextIconContainer>
+        </NextLinkButton>
+      )}
+    </Container>
+  );
+}

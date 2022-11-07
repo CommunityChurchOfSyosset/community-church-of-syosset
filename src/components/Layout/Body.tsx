@@ -1,13 +1,15 @@
-import BackgroundImage, { IFluidObject } from 'gatsby-background-image';
+import BackgroundImage from 'gatsby-background-image';
+import { IGatsbyImageData } from 'gatsby-plugin-image';
+import { convertToBgImage } from 'gbimage-bridge';
 import React from 'react';
 import styled from 'styled-components';
 
 import { baseline, breakpoint } from '../../style';
 import BackgroundVideo from '../BackgroundVideo';
 
-type BreakpointContainerProps = {
-  display?: string;
-};
+interface BreakpointContainerProps {
+  readonly display?: string;
+}
 
 const BreakpointContainer = styled.div<BreakpointContainerProps>`
   ${props => props.display && `display: ${props.display};`}
@@ -31,9 +33,9 @@ const BreakpointContainer = styled.div<BreakpointContainerProps>`
   }
 `;
 
-type BackgroundVideoContainerProps = {
-  overlay?: string;
-};
+interface BackgroundVideoContainerProps {
+  readonly overlay?: string;
+}
 
 const BackgroundVideoContainer = styled.main<BackgroundVideoContainerProps>`
   background-color: ${props => props.overlay};
@@ -53,43 +55,56 @@ const StyledBackgroundImage = styled(BackgroundImage)`
   padding: 0 calc(3 * ${baseline});
 `;
 
-type Props = {
-  backgroundImage?: IFluidObject | IFluidObject[] | (IFluidObject | string)[];
-  backgroundVideoOverlay?: string;
-  backgroundVideoUrl?: string;
-  children: React.ReactNode;
-  className?: string;
-  display?: string;
-};
+export type BackgroundImageStack =
+  | IGatsbyImageData
+  | IGatsbyImageData[]
+  | (IGatsbyImageData | string)[];
 
-const Body: React.FC<Props> = ({
-  backgroundImage,
-  backgroundVideoOverlay,
-  backgroundVideoUrl,
-  children,
-  className,
-  display,
-}) =>
-  backgroundVideoUrl ? (
-    <BackgroundVideoContainer
-      className={className}
-      overlay={backgroundVideoOverlay}
-    >
-      <BackgroundVideo url={backgroundVideoUrl} />
-      <BreakpointContainer display={display}>{children}</BreakpointContainer>
-    </BackgroundVideoContainer>
-  ) : backgroundImage ? (
-    <StyledBackgroundImage
-      className={className}
-      fluid={backgroundImage}
-      Tag="main"
-    >
-      <BreakpointContainer display={display}>{children}</BreakpointContainer>
-    </StyledBackgroundImage>
-  ) : (
-    <Container className={className}>
-      <BreakpointContainer display={display}>{children}</BreakpointContainer>
+export interface Props {
+  readonly backgroundImage?: BackgroundImageStack;
+  readonly backgroundVideoOverlay?: string;
+  readonly backgroundVideoUrl?: string;
+  readonly children: React.ReactNode;
+  readonly className?: string;
+  readonly display?: string;
+}
+
+export default function Body(props: Props) {
+  if (props.backgroundVideoUrl) {
+    return (
+      <BackgroundVideoContainer
+        className={props.className}
+        overlay={props.backgroundVideoOverlay}
+      >
+        <BackgroundVideo url={props.backgroundVideoUrl} />
+        <BreakpointContainer display={props.display}>
+          {props.children}
+        </BreakpointContainer>
+      </BackgroundVideoContainer>
+    );
+  }
+
+  if (props.backgroundImage) {
+    const bgImage = convertToBgImage(props.backgroundImage);
+
+    return (
+      <StyledBackgroundImage
+        className={props.className}
+        Tag="main"
+        {...bgImage}
+      >
+        <BreakpointContainer display={props.display}>
+          {props.children}
+        </BreakpointContainer>
+      </StyledBackgroundImage>
+    );
+  }
+
+  return (
+    <Container className={props.className}>
+      <BreakpointContainer display={props.display}>
+        {props.children}
+      </BreakpointContainer>
     </Container>
   );
-
-export default Body;
+}

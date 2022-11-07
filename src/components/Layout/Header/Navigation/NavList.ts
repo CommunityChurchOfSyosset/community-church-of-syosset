@@ -2,9 +2,9 @@ import styled from 'styled-components';
 
 import { color } from '../../../../style';
 
-type Props = {
-  headerHeight: number;
-  layoutBreakpoint: string;
+export interface Props {
+  readonly headerHeight: number;
+  readonly layoutBreakpoint: string;
 };
 
 const NavList = styled.ul<Props>`

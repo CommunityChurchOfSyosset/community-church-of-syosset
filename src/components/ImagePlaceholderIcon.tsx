@@ -14,9 +14,9 @@ const Frame = styled.div`
   justify-content: space-around;
 `;
 
-type IconProps = {
-  fontSize: string;
-};
+interface IconProps {
+  readonly fontSize: string;
+}
 
 const Icon = styled(FontAwesomeIcon)<IconProps>`
   && {
@@ -24,20 +24,16 @@ const Icon = styled(FontAwesomeIcon)<IconProps>`
   }
 `;
 
-type Props = {
-  className?: string;
-  icon: IconProp;
-  iconSize: string;
-};
+export interface Props {
+  readonly className?: string;
+  readonly icon: IconProp;
+  readonly iconSize: string;
+}
 
-const ImagePlaceholderIcon: React.FC<Props> = ({
-  className,
-  icon,
-  iconSize,
-}) => (
-  <Frame className={className}>
-    <Icon fontSize={iconSize} icon={icon} />
-  </Frame>
-);
-
-export default ImagePlaceholderIcon;
+export default function ImagePlaceholderIcon(props: Props) {
+  return (
+    <Frame className={props.className}>
+      <Icon fontSize={props.iconSize} icon={props.icon} />
+    </Frame>
+  );
+}

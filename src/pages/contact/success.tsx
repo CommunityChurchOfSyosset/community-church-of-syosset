@@ -1,5 +1,5 @@
 import { graphql, useStaticQuery } from 'gatsby';
-import { FluidObject } from 'gatsby-image';
+import { IGatsbyImageData } from 'gatsby-plugin-image';
 import React from 'react';
 import styled from 'styled-components';
 
@@ -21,19 +21,17 @@ const StyledLinkButton = styled(LinkButton)`
   margin-bottom: calc(6 * ${baseline});
 `;
 
-type Data = {
-  contentfulAsset?: {
-    fluid: FluidObject;
+interface Data {
+  readonly contentfulAsset?: {
+    readonly gatsbyImageData: IGatsbyImageData;
   };
-};
+}
 
-const ContactSuccessPage: React.FC = () => {
+export default function ContactSuccessPage() {
   const data = useStaticQuery<Data>(graphql`
     query ContactSuccessPage {
       contentfulAsset(title: { eq: "Contact Success Page Background Image" }) {
-        fluid {
-          ...GatsbyContentfulFluid
-        }
+        gatsbyImageData(layout: FULL_WIDTH)
       }
     }
   `);
@@ -41,7 +39,7 @@ const ContactSuccessPage: React.FC = () => {
   const backgroundImageStack = data.contentfulAsset
     ? [
         'linear-gradient(rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0.75))',
-        data.contentfulAsset.fluid,
+        data.contentfulAsset.gatsbyImageData,
       ]
     : undefined;
 
@@ -58,6 +56,4 @@ const ContactSuccessPage: React.FC = () => {
       </Layout>
     </>
   );
-};
-
-export default ContactSuccessPage;
+}

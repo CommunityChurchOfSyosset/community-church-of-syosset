@@ -32,18 +32,18 @@ const StyledVideoPlayer = styled(VideoPlayer)`
   margin: calc(6 * ${baseline}) 0;
 `;
 
-type Data = {
-  contentfulJsonObject: {
-    json: {
-      pastorsMessageVideoUrl: string;
+interface Data {
+  readonly contentfulJsonObject: {
+    readonly json: {
+      readonly pastorsMessageVideoUrl: string;
     };
   };
-  contentfulPerson: {
-    name: string;
+  readonly contentfulPerson: {
+    readonly name: string;
   };
-};
+}
 
-const PastorPage: React.FC = () => {
+export default function PastorPage() {
   const data = useStaticQuery<Data>(graphql`
     query PastorPage {
       contentfulJsonObject(title: { eq: "Website Data" }) {
@@ -80,6 +80,4 @@ const PastorPage: React.FC = () => {
       </Layout>
     </>
   );
-};
-
-export default PastorPage;
+}

@@ -2,19 +2,14 @@ import { useStaticQuery, graphql } from 'gatsby';
 import React from 'react';
 import Helmet from 'react-helmet';
 
-type Props = {
-  description?: string;
-  lang?: string;
-  meta?: [];
-  title: string;
-};
+export interface Props {
+  readonly description?: string;
+  readonly lang?: string;
+  readonly meta?: [];
+  readonly title: string;
+}
 
-const SEO: React.FC<Props> = ({
-  description = '',
-  lang = 'en',
-  meta = [],
-  title,
-}) => {
+export default function SEO(props: Props) {
   const data = useStaticQuery(
     graphql`
       query SEOComponent {
@@ -36,7 +31,8 @@ const SEO: React.FC<Props> = ({
   );
 
   const metaDescription =
-    description || data.contentfulJsonObject.json.siteMetadata.description;
+    props.description ||
+    data.contentfulJsonObject.json.siteMetadata.description;
 
   let locationHref: string | undefined;
 
@@ -46,10 +42,8 @@ const SEO: React.FC<Props> = ({
 
   return (
     <Helmet
-      htmlAttributes={{
-        lang,
-      }}
-      title={title}
+      htmlAttributes={{ lang: props.lang || 'en' }}
+      title={props.title}
       titleTemplate={`%s | ${data.contentfulJsonObject.json.siteMetadata.title}`}
       meta={[
         {
@@ -58,7 +52,7 @@ const SEO: React.FC<Props> = ({
         },
         {
           property: 'og:title',
-          content: title,
+          content: props.title,
         },
         {
           property: 'og:description',
@@ -86,15 +80,13 @@ const SEO: React.FC<Props> = ({
         },
         {
           name: 'twitter:title',
-          content: title,
+          content: props.title,
         },
         {
           name: 'twitter:description',
           content: metaDescription,
         },
-      ].concat(meta)}
+      ].concat(props.meta ?? [])}
     />
   );
-};
-
-export default SEO;
+}

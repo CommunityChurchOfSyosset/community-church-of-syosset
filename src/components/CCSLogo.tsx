@@ -2,21 +2,21 @@ import React from 'react';
 
 import { color } from '../style';
 
-type Props = {
-  className?: string;
-  whiteScale?: boolean;
-};
+const TRANSPARENT = 'rgba(0, 0, 0, 0)';
 
-const CCSLogo: React.FC<Props> = ({ className, whiteScale }) => {
-  const TRANSPARENT = 'rgba(0, 0, 0, 0)';
+export interface Props {
+  readonly className?: string;
+  readonly whiteScale?: boolean;
+}
 
-  const circleColor = whiteScale ? color.white : color.ucc.darkBlue;
-  const commaColor = whiteScale ? TRANSPARENT : color.ucc.lightBlue;
-  const textColor = whiteScale ? color.white : color.body;
+export default function CCSLogo(props: Props) {
+  const circleColor = props.whiteScale ? color.white : color.ucc.darkBlue;
+  const commaColor = props.whiteScale ? TRANSPARENT : color.ucc.lightBlue;
+  const textColor = props.whiteScale ? color.white : color.body;
 
   return (
     <svg
-      className={className}
+      className={props.className}
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 374.85 65.44"
     >
@@ -275,6 +275,4 @@ const CCSLogo: React.FC<Props> = ({ className, whiteScale }) => {
       />
     </svg>
   );
-};
-
-export default CCSLogo;
+}

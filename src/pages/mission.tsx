@@ -1,5 +1,4 @@
 import { graphql, useStaticQuery } from 'gatsby';
-import { FixedObject } from 'gatsby-image';
 import React from 'react';
 import styled from 'styled-components';
 
@@ -7,7 +6,9 @@ import CenteredTextColumn from '../components/CenteredTextColumn';
 import ExternalLink from '../components/ExternalLink';
 import Layout from '../components/Layout';
 import Lead from '../components/Lead';
-import MissionCardList from '../components/MissionCardList';
+import OrganizationCardList, {
+  Props as OrganizationCardListProps,
+} from '../components/OrganizationCardList';
 import SEO from '../components/SEO';
 import { baseline } from '../style';
 
@@ -16,38 +17,31 @@ const NoMissionsNotice = styled(Lead)`
   text-align: center;
 `;
 
-const StyledMissionCardList = styled(MissionCardList)`
+const StyledOrganizationCardList = styled(OrganizationCardList)`
   margin: 0 auto calc(6 * ${baseline});
 `;
 
-type Data = {
-  allContentfulMission: {
-    edges: {
-      node: {
-        id: string;
-        image?: {
-          description?: string;
-          fixed: FixedObject;
-        };
-        name: string;
-        url: string;
-      };
-    }[];
+interface Data {
+  readonly contentfulContentList: {
+    readonly items: OrganizationCardListProps['organizations'];
   };
-};
+}
 
-const MissionPage: React.FC = () => {
+export default function MissionPage() {
   const data = useStaticQuery<Data>(graphql`
     query MissionPage {
-      allContentfulMission {
-        edges {
-          node {
+      contentfulContentList(title: { eq: "Mission List" }) {
+        items {
+          ... on ContentfulOrganization {
             id
             image {
               description
-              fixed(height: 272, width: 272) {
-                ...GatsbyContentfulFixed
-              }
+              gatsbyImageData(
+                height: 272
+                layout: FIXED
+                quality: 100
+                width: 272
+              )
             }
             name
             url
@@ -57,7 +51,17 @@ const MissionPage: React.FC = () => {
     }
   `);
 
-  const missions = data.allContentfulMission.edges.map(({ node }) => node);
+  const organizations = data.contentfulContentList.items;
+
+  const missionContent =
+    organizations.length > 0 ? (
+      <StyledOrganizationCardList organizations={organizations} />
+    ) : (
+      <NoMissionsNotice>
+        No outreaches listed… <br />
+        Check back soon!
+      </NoMissionsNotice>
+    );
 
   return (
     <>
@@ -96,17 +100,8 @@ const MissionPage: React.FC = () => {
             for all.
           </p>
         </CenteredTextColumn>
-        {missions.length > 0 ? (
-          <StyledMissionCardList missions={missions} />
-        ) : (
-          <NoMissionsNotice>
-            No missions listed… <br />
-            Check back soon!
-          </NoMissionsNotice>
-        )}
+        {missionContent}
       </Layout>
     </>
   );
-};
-
-export default MissionPage;
+}

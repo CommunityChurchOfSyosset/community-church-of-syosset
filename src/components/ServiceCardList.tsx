@@ -1,8 +1,6 @@
-import { FixedObject } from 'gatsby-image';
 import React from 'react';
 import styled from 'styled-components';
-
-import ServiceCard from './ServiceCard';
+import ServiceCard, { Props as ServiceCardProps } from './ServiceCard';
 import { baseline, color } from '../style';
 
 const ListItem = styled.li`
@@ -18,25 +16,22 @@ const UnorderedList = styled.ul`
   padding-left: 0;
 `;
 
-type Props = {
-  className?: string;
-  services: {
-    date: string;
-    id: string;
-    image?: {
-      description?: string;
-      fixed: FixedObject;
-    };
-    preacher: {
-      name: string;
-    };
-    slug: string;
-    title: string;
-  }[];
-};
+interface Service {
+  readonly date: ServiceCardProps['date'];
+  readonly id: string;
+  readonly image: ServiceCardProps['image'];
+  readonly preacher: ServiceCardProps['preacher'];
+  readonly slug: ServiceCardProps['slug'];
+  readonly title: ServiceCardProps['title'];
+}
 
-const ServiceCardList: React.FC<Props> = ({ className, services }) => {
-  const serviceCards = services.map(service => (
+export interface Props {
+  readonly className?: string;
+  readonly services: readonly Service[];
+}
+
+export default function ServiceCardList(props: Props) {
+  const serviceCards = props.services.map(service => (
     <ListItem key={service.id}>
       <StyledServiceCard
         date={service.date}
@@ -48,7 +43,7 @@ const ServiceCardList: React.FC<Props> = ({ className, services }) => {
     </ListItem>
   ));
 
-  return <UnorderedList className={className}>{serviceCards}</UnorderedList>;
-};
-
-export default ServiceCardList;
+  return (
+    <UnorderedList className={props.className}>{serviceCards}</UnorderedList>
+  );
+}

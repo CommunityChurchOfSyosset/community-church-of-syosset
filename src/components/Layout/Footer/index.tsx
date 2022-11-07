@@ -2,7 +2,9 @@ import React from 'react';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import CopyrightNotice from './CopyrightNotice';
+import CopyrightNotice, {
+  Props as CopyrightNoticeProps,
+} from './CopyrightNotice';
 import ExternalLink from '../../ExternalLink';
 import TitledList from '../../TitledList';
 import { baseline, breakpoint, color } from '../../../style';
@@ -47,58 +49,54 @@ const StyledTitledList = styled(TitledList)`
   }
 `;
 
-type Props = {
-  className?: string;
-  copyright: {
-    holder: string;
-    initialYear: number;
+export interface Props {
+  readonly className?: string;
+  readonly copyright: {
+    readonly holder: CopyrightNoticeProps['holder'];
+    readonly initialYear: CopyrightNoticeProps['initialYear'];
   };
-  organization: {
-    address: {
-      city: string;
-      state: string;
-      street: string;
-      zip: string;
+  readonly organization: {
+    readonly address: {
+      readonly city: string;
+      readonly state: string;
+      readonly street: string;
+      readonly zip: string;
     };
-    name: string;
-    phone: string;
+    readonly name: string;
+    readonly phone: string;
   };
-  socialMedia: {
-    facebook: {
-      slug: string;
+  readonly socialMedia: {
+    readonly facebook: {
+      readonly slug: string;
     };
   };
-};
+}
 
-const Footer: React.FC<Props> = ({
-  className,
-  copyright,
-  organization,
-  socialMedia,
-}) => {
-  const phoneString = organization.phone.replace(
+export default function Footer(props: Props) {
+  const phoneString = props.organization.phone.replace(
     /(\d{3})(\d{3})(\d{4})/,
     '($1)$2-$3'
   );
 
   return (
-    <StyledFooter className={className}>
+    <StyledFooter className={props.className}>
       <Grid>
         <address>
           <p>
-            <b>{organization.name}</b> <br />
-            {organization.address.street} <br />
-            {organization.address.city}, {organization.address.state}{' '}
-            {organization.address.zip} <br />
+            <b>{props.organization.name}</b> <br />
+            {props.organization.address.street} <br />
+            {props.organization.address.city},{' '}
+            {props.organization.address.state} {props.organization.address.zip}{' '}
+            <br />
             <FontAwesomeIcon icon="phone" />{' '}
-            <a href={`tel:+1${organization.phone}`}>{phoneString}</a>
+            <a href={`tel:+1${props.organization.phone}`}>{phoneString}</a>
           </p>
         </address>
         <StyledTitledList title="Social media" type="unordered">
           <>
             <FontAwesomeIcon icon={['fab', 'facebook-square']} />{' '}
             <StyledExternalLink
-              href={`https://www.facebook.com/${socialMedia.facebook.slug}/`}
+              href={`https://www.facebook.com/${props.socialMedia.facebook.slug}/`}
             >
               Facebook
             </StyledExternalLink>
@@ -115,11 +113,9 @@ const Footer: React.FC<Props> = ({
       </Grid>
       <CopyrightNotice
         currentYear={new Date().getFullYear()}
-        holder={copyright.holder}
-        initialYear={copyright.initialYear}
+        holder={props.copyright.holder}
+        initialYear={props.copyright.initialYear}
       />
     </StyledFooter>
   );
-};
-
-export default Footer;
+}

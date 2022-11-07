@@ -1,12 +1,15 @@
-import { documentToReactComponents } from '@contentful/rich-text-react-renderer';
-import { Document } from '@contentful/rich-text-types';
 import { graphql } from 'gatsby';
-import { FixedObject } from 'gatsby-image';
+import { GatsbyImage } from 'gatsby-plugin-image';
+import {
+  ContentfulRichTextGatsbyReference,
+  renderRichText,
+  RenderRichTextData,
+} from 'gatsby-source-contentful/rich-text';
 import React from 'react';
 import styled from 'styled-components';
 
 import CenteredTextColumn from '../components/CenteredTextColumn';
-import FixedImage from '../components/FixedImage';
+import FixedImage, { Props as FixedImageProps } from '../components/FixedImage';
 import Layout from '../components/Layout';
 import Lead from '../components/Lead';
 import SEO from '../components/SEO';
@@ -16,13 +19,19 @@ export const query = graphql`
   query PersonTemplate($id: String!) {
     contentfulPerson(id: { eq: $id }) {
       biography {
-        json
+        raw
+        references {
+          ... on ContentfulAsset {
+            contentful_id
+            __typename
+            description
+            gatsbyImageData(layout: CONSTRAINED)
+          }
+        }
       }
       image {
         description
-        fixed(height: 272, width: 272) {
-          ...GatsbyContentfulFixed
-        }
+        gatsbyImageData(height: 272, layout: FIXED, quality: 100, width: 272)
       }
       name
       role
@@ -42,45 +51,52 @@ const StyledFixedImage = styled(FixedImage)`
   width: calc(68 * ${baseline});
 `;
 
-type Props = {
-  data: {
-    contentfulPerson: {
-      biography?: {
-        json: Document;
-      };
-      image?: {
-        description?: string;
-        fixed: FixedObject;
-      };
-      name: string;
-      role: string;
+export interface Props {
+  readonly data: {
+    readonly contentfulPerson: {
+      readonly biography?: RenderRichTextData<
+        ContentfulRichTextGatsbyReference
+      >;
+      readonly image: FixedImageProps['image'];
+      readonly name: string;
+      readonly role: string;
     };
   };
-};
+}
 
-const PersonTemplate: React.FC<Props> = ({ data }) => (
-  <>
-    <SEO title={data.contentfulPerson.name} />
-    <Layout>
-      <h1>{data.contentfulPerson.name}</h1>
-      <CenteredTextColumn>
-        <ImageFrame>
-          <StyledFixedImage
-            image={data.contentfulPerson.image}
-            imageWrapperStyle={{ display: 'block' }}
-            placeholderIcon="user"
-            placeholderIconSize={`calc(62 * ${baseline})`}
-          />
-        </ImageFrame>
-        <Lead>{data.contentfulPerson.role}</Lead>
-        {data.contentfulPerson.biography ? (
-          documentToReactComponents(data.contentfulPerson.biography.json)
-        ) : (
-          <p>No biography yet… Check back soon!</p>
-        )}
-      </CenteredTextColumn>
-    </Layout>
-  </>
-);
-
-export default PersonTemplate;
+export default function PersonTemplate(props: Props) {
+  return (
+    <>
+      <SEO title={props.data.contentfulPerson.name} />
+      <Layout>
+        <h1>{props.data.contentfulPerson.name}</h1>
+        <CenteredTextColumn>
+          <ImageFrame>
+            <StyledFixedImage
+              image={props.data.contentfulPerson.image}
+              imageWrapperStyle={{ display: 'block' }}
+              placeholderIcon="user"
+              placeholderIconSize={`calc(62 * ${baseline})`}
+            />
+          </ImageFrame>
+          <Lead>{props.data.contentfulPerson.role}</Lead>
+          {props.data.contentfulPerson.biography ? (
+            renderRichText(props.data.contentfulPerson.biography, {
+              renderNode: {
+                'embedded-asset-block': node =>
+                  node.data.target.gatsbyImageData ? (
+                    <GatsbyImage
+                      alt={node.data.target.description}
+                      image={node.data.target.gatsbyImageData}
+                    />
+                  ) : null,
+              },
+            })
+          ) : (
+            <p>No biography yet… Check back soon!</p>
+          )}
+        </CenteredTextColumn>
+      </Layout>
+    </>
+  );
+}

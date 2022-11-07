@@ -1,5 +1,5 @@
 import { graphql, useStaticQuery } from 'gatsby';
-import { FluidObject } from 'gatsby-image';
+import { IGatsbyImageData } from 'gatsby-plugin-image';
 import React from 'react';
 import styled from 'styled-components';
 
@@ -38,19 +38,17 @@ const StyledLinkButton = styled(LinkButton)`
   }
 `;
 
-type Data = {
-  contentfulAsset?: {
-    fluid: FluidObject;
+interface Data {
+  readonly contentfulAsset?: {
+    readonly gatsbyImageData: IGatsbyImageData;
   };
-};
+}
 
-const Error404Page: React.FC = () => {
+export default function Error404Page() {
   const data = useStaticQuery<Data>(graphql`
     query Error404Page {
       contentfulAsset(title: { eq: "Error 404 Page Background Image" }) {
-        fluid {
-          ...GatsbyContentfulFluid
-        }
+        gatsbyImageData(layout: FULL_WIDTH)
       }
     }
   `);
@@ -58,9 +56,9 @@ const Error404Page: React.FC = () => {
   const backgroundImageStack = data.contentfulAsset
     ? [
         'linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5))',
-        data.contentfulAsset.fluid,
+        data.contentfulAsset.gatsbyImageData,
       ]
-    : 'linear-gradient(rgba(0, 0, 0, 1), rgba(0, 0, 0, 1))';
+    : ['linear-gradient(rgba(0, 0, 0, 1), rgba(0, 0, 0, 1))'];
 
   return (
     <>
@@ -77,6 +75,4 @@ const Error404Page: React.FC = () => {
       </StyledLayout>
     </>
   );
-};
-
-export default Error404Page;
+}

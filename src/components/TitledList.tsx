@@ -6,28 +6,27 @@ const Title = styled.p`
   margin-bottom: 0;
 `;
 
-export type Props = {
-  children: React.ReactNode;
-  className?: string;
-  title: string;
-  type: 'ordered' | 'unordered';
-};
+export interface Props {
+  readonly children: React.ReactNode;
+  readonly className?: string;
+  readonly title: string;
+  readonly type: 'ordered' | 'unordered';
+}
 
-const TitledList: React.FC<Props> = ({ children, className, title, type }) => {
-  const List = getListTag(type);
-  const listItems = React.Children.map(children, (child, index) => (
+export default function TitledList(props: Props) {
+  const List = getListTag(props.type);
+
+  const listItems = React.Children.map(props.children, (child, index) => (
     <li key={index}>{child}</li>
   ));
 
   return (
-    <div className={className}>
-      <Title>{title}</Title>
+    <div className={props.className}>
+      <Title>{props.title}</Title>
       <List>{listItems}</List>
     </div>
   );
-};
-
-export default TitledList;
+}
 
 function getListTag(type: 'ordered' | 'unordered') {
   switch (type) {

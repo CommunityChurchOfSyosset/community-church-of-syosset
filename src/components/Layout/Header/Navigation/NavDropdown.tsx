@@ -4,11 +4,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { baseline, color } from '../../../../style';
 
-type ButtonProps = {
-  childIsActive: boolean;
-  dropdownListIsShown: boolean;
-  layoutBreakpoint: string;
-};
+interface ButtonProps {
+  readonly childIsActive: boolean;
+  readonly dropdownListIsShown: boolean;
+  readonly layoutBreakpoint: string;
+}
 
 const Button = styled.button<ButtonProps>`
   align-items: center;
@@ -40,9 +40,9 @@ const Button = styled.button<ButtonProps>`
 
   && {
     color: ${props =>
-    props.childIsActive || props.dropdownListIsShown
-      ? color.white
-      : 'inherit'};
+      props.childIsActive || props.dropdownListIsShown
+        ? color.white
+        : 'inherit'};
   }
 
   @media (min-width: ${props => props.layoutBreakpoint}) {
@@ -52,11 +52,11 @@ const Button = styled.button<ButtonProps>`
   }
 `;
 
-type DropdownListProps = {
-  height: number;
-  isShown: boolean;
-  layoutBreakpoint: string;
-};
+interface DropdownListProps {
+  readonly height: number;
+  readonly isShown: boolean;
+  readonly layoutBreakpoint: string;
+}
 
 const DropdownList = styled.ul<DropdownListProps>`
   background-color: ${color.body};
@@ -99,8 +99,8 @@ const DropdownList = styled.ul<DropdownListProps>`
   }
 `;
 
-type ListItemProps = {
-  borderBreakpoint: string;
+interface ListItemProps {
+  readonly borderBreakpoint: string;
 }
 
 const ListItem = styled.li<ListItemProps>`
@@ -115,69 +115,67 @@ const StyledFontAwesomeIcon = styled(FontAwesomeIcon)`
   margin-left: 0.5em;
 `;
 
-type Props = {
-  children: React.ReactNode;
-  className?: string;
-  dropdownListIsShown: boolean;
-  id: string;
-  layoutBreakpoint: string;
-  setActiveDropdownId: React.Dispatch<React.SetStateAction<string | null>>;
-  title: string;
-};
+export interface Props {
+  readonly children: React.ReactNode;
+  readonly className?: string;
+  readonly dropdownListIsShown: boolean;
+  readonly id: string;
+  readonly layoutBreakpoint: string;
+  readonly setActiveDropdownId: React.Dispatch<
+    React.SetStateAction<string | null>
+  >;
+  readonly title: string;
+}
 
-const NavDropdown: React.FC<Props> = ({
-  children,
-  className,
-  dropdownListIsShown,
-  id,
-  layoutBreakpoint,
-  setActiveDropdownId,
-  title,
-}) => {
-  const [listHeight, setListHeight] = useState();
+export default function NavDropdown(props: Props) {
+  const [listHeight, setListHeight] = useState<number>(0);
   const [dropdownListIsHiding, setDropdownListIsHiding] = useState(false);
   const [childIsActive, setChildIsActive] = useState(false);
+  useEffect(() => getAndSetChildIsActive(setChildIsActive, props.id), []);
 
-  useEffect(() => getAndSetChildIsActive(setChildIsActive, id), []);
-  useEffect(() => setListHeightAndlistenForWindowResize(setListHeight, id), []);
+  useEffect(
+    () => setListHeightAndlistenForWindowResize(setListHeight, props.id),
+    []
+  );
 
   return (
-    <ListItem borderBreakpoint={layoutBreakpoint} className={className} >
+    <ListItem
+      borderBreakpoint={props.layoutBreakpoint}
+      className={props.className}
+    >
       <Button
         childIsActive={childIsActive}
-        dropdownListIsShown={dropdownListIsShown}
-        layoutBreakpoint={layoutBreakpoint}
+        dropdownListIsShown={props.dropdownListIsShown}
+        layoutBreakpoint={props.layoutBreakpoint}
         onClick={() =>
           handleClick(
-            dropdownListIsShown,
-            setActiveDropdownId,
+            props.dropdownListIsShown,
+            props.setActiveDropdownId,
             setDropdownListIsHiding,
-            id
+            props.id
           )
         }
       >
-        {title}
+        {props.title}
         <StyledFontAwesomeIcon
           icon="chevron-right"
-          rotation={dropdownListIsShown ? 90 : undefined}
+          rotation={props.dropdownListIsShown ? 90 : undefined}
         />
       </Button>
       <DropdownList
-        className={`${dropdownListIsShown ? 'show' : ''}${
+        className={`${props.dropdownListIsShown ? 'show' : ''}${
           dropdownListIsHiding ? 'hiding' : ''
         }`}
         height={listHeight}
-        id={id}
-        isShown={dropdownListIsShown}
-        layoutBreakpoint={layoutBreakpoint}
+        id={props.id}
+        isShown={props.dropdownListIsShown}
+        layoutBreakpoint={props.layoutBreakpoint}
       >
-        {children}
+        {props.children}
       </DropdownList>
     </ListItem>
   );
-};
-
-export default NavDropdown;
+}
 
 function getAndSetChildIsActive(
   setChildIsActive: React.Dispatch<React.SetStateAction<boolean>>,
@@ -209,11 +207,8 @@ function hideDropdownList(
   setDropdownIsHiding: React.Dispatch<React.SetStateAction<boolean>>
 ) {
   const TRANSITION_DURATION = 500;
-
   setDropdownIsHiding(true);
-  setTimeout(() => {
-    setDropdownIsHiding(false);
-  }, TRANSITION_DURATION);
+  setTimeout(() => setDropdownIsHiding(false), TRANSITION_DURATION);
 }
 
 function setListHeightAndlistenForWindowResize(
@@ -221,13 +216,8 @@ function setListHeightAndlistenForWindowResize(
   id: string
 ) {
   getAndSetListHeight(setListHeight, id);
-
-  const handleWindowResize = () => {
-    getAndSetListHeight(setListHeight, id);
-  };
-
+  const handleWindowResize = () => getAndSetListHeight(setListHeight, id);
   window.addEventListener('resize', handleWindowResize);
-
   return () => window.removeEventListener('resize', handleWindowResize);
 }
 
@@ -237,6 +227,7 @@ function getAndSetListHeight(
 ) {
   const listElement = document?.querySelector(`#${id}`);
   const numberOfListItems = listElement?.children.length;
+
   const listItemHeight: number | undefined =
     listElement?.children[0].offsetHeight;
 

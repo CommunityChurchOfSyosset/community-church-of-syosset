@@ -1,13 +1,12 @@
 import { Link } from 'gatsby';
-import { FixedObject } from 'gatsby-image';
 import React from 'react';
 import styled from 'styled-components';
 
 import Card from './Card';
-import FixedImage from './FixedImage';
+import FixedImage, { Props as FixedImageProps } from './FixedImage';
 import { baseline, typography } from '../style';
 
-const DATE_FORMAT_OPTIONS = {
+const DATE_FORMAT_OPTIONS: Intl.DateTimeFormatOptions = {
   day: 'numeric',
   month: 'long',
   year: 'numeric',
@@ -46,54 +45,43 @@ const Title = styled.p`
   margin-bottom: 0;
 `;
 
-type Props = {
-  className?: string;
-  date: string;
-  image?: {
-    description?: string;
-    fixed: FixedObject;
+export interface Props {
+  readonly className?: string;
+  readonly date: string;
+  readonly image: FixedImageProps['image'];
+  readonly preacher: {
+    readonly name: string;
   };
-  preacher: {
-    name: string;
-  };
-  slug: string;
-  title: string;
-};
+  readonly slug: string;
+  readonly title: string;
+}
 
-const ServiceCard: React.FC<Props> = ({
-  className,
-  date,
-  image,
-  preacher,
-  slug,
-  title,
-}) => {
-  const [year, month, day] = date.split('-');
+export default function ServiceCard(props: Props) {
+  const [year, month, day] = props.date.split('-');
   const dateObject = new Date(+year, +month - 1, +day);
+
   const dateString = dateObject.toLocaleDateString(
     undefined,
     DATE_FORMAT_OPTIONS
   );
 
   return (
-    <Card className={className}>
-      <StyledLink to={`/services/${slug}`}>
+    <Card className={props.className}>
+      <StyledLink to={`/services/${props.slug}`}>
         <StyledFixedImage
-          image={image}
+          image={props.image}
           imageWrapperStyle={{ display: 'block' }}
           placeholderIcon="bible"
           placeholderIconSize={`calc(12 * ${baseline})`}
         />
         <div>
-          <Title>{title}</Title>
+          <Title>{props.title}</Title>
           <DateDisplay>
-            <time dateTime={date}>{dateString}</time>
+            <time dateTime={props.date}>{dateString}</time>
           </DateDisplay>
-          <Preacher>{preacher.name}</Preacher>
+          <Preacher>{props.preacher.name}</Preacher>
         </div>
       </StyledLink>
     </Card>
   );
-};
-
-export default ServiceCard;
+}

@@ -1,12 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import ImageGalleryCard, {
-  Props as ImageGalleryCardProps,
-} from './ImageGalleryCard';
+import OrganizationCard, {
+  Props as OrganizationCardProps,
+} from './OrganizationCard';
 import { baseline, breakpoint, color } from '../style';
 
-const StyledImageGalleryCard = styled(ImageGalleryCard)`
+const StyledOrganizationCard = styled(OrganizationCard)`
   box-shadow: 0 0 5px ${color.black};
 `;
 
@@ -27,32 +27,29 @@ const UnorderedList = styled.ul`
   }
 `;
 
-interface ImageGallery {
+interface Organization extends OrganizationCardProps {
   readonly id: string;
-  readonly images: ImageGalleryCardProps['image'][];
-  readonly slug: string;
-  readonly title: string;
 }
 
 export interface Props {
   readonly className?: string;
-  readonly imageGalleries: ImageGallery[];
+  readonly organizations: readonly Organization[];
 }
 
-export default function ImageGalleryCardList(props: Props) {
-  const imageGalleryCards = props.imageGalleries.map(imageGallery => (
-    <li key={imageGallery.id}>
-      <StyledImageGalleryCard
-        image={imageGallery.images[0]}
-        slug={imageGallery.slug}
-        title={imageGallery.title}
+export default function OrganizationCardList(props: Props) {
+  const organizationCards = props.organizations.map(organization => (
+    <li key={organization.id}>
+      <StyledOrganizationCard
+        image={organization.image}
+        name={organization.name}
+        url={organization.url}
       />
     </li>
   ));
 
   return (
     <UnorderedList className={props.className}>
-      {imageGalleryCards}
+      {organizationCards}
     </UnorderedList>
   );
 }

@@ -1,19 +1,18 @@
 import { Link } from 'gatsby';
-import { FixedObject } from 'gatsby-image';
 import React from 'react';
 import styled from 'styled-components';
 
 import Card from './Card';
-import FixedImage from './FixedImage';
+import FixedImage, { Props as FixedImageProps } from './FixedImage';
 import { baseline, typography } from '../style';
 
-const DATE_FORMAT_OPTIONS = {
+const DATE_FORMAT_OPTIONS: Intl.DateTimeFormatOptions = {
   day: 'numeric',
   month: 'long',
   year: 'numeric',
 };
 
-const TIME_FORMAT_OPTIONS = {
+const TIME_FORMAT_OPTIONS: Intl.DateTimeFormatOptions = {
   hour: 'numeric',
   minute: '2-digit',
   timeZoneName: 'short',
@@ -47,25 +46,16 @@ const Title = styled.p`
   margin-bottom: 0;
 `;
 
-type Props = {
-  className?: string;
-  date: string;
-  image?: {
-    description?: string;
-    fixed: FixedObject;
-  };
-  slug: string;
-  title: string;
-};
+export interface Props {
+  readonly className?: string;
+  readonly date: string;
+  readonly image: FixedImageProps['image'];
+  readonly slug: string;
+  readonly title: string;
+}
 
-const EventCard: React.FC<Props> = ({
-  className,
-  date,
-  image,
-  slug,
-  title,
-}) => {
-  const dateObject = new Date(date);
+export default function EventCard(props: Props) {
+  const dateObject = new Date(props.date);
 
   const dateString = dateObject.toLocaleDateString(
     undefined,
@@ -78,18 +68,18 @@ const EventCard: React.FC<Props> = ({
   );
 
   return (
-    <Card className={className}>
-      <StyledLink to={`/events/${slug}`}>
+    <Card className={props.className}>
+      <StyledLink to={`/events/${props.slug}`}>
         <StyledFixedImage
-          image={image}
+          image={props.image}
           imageWrapperStyle={{ display: 'block' }}
           placeholderIcon={['far', 'calendar']}
           placeholderIconSize={`calc(12 * ${baseline})`}
         />
         <div>
-          <Title>{title}</Title>
+          <Title>{props.title}</Title>
           <DateAndTime>
-            <time dateTime={date}>
+            <time dateTime={props.date}>
               {dateString} <br />
               {timeString}
             </time>
@@ -98,6 +88,4 @@ const EventCard: React.FC<Props> = ({
       </StyledLink>
     </Card>
   );
-};
-
-export default EventCard;
+}

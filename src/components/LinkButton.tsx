@@ -13,27 +13,22 @@ const StyledButton = styled(Button)`
   }
 `;
 
-type Props = {
-  activeClassName?: string;
-  children: React.ReactNode;
-  className?: string;
-  to: string;
-};
+export interface Props {
+  readonly activeClassName?: string;
+  readonly children: React.ReactNode;
+  readonly className?: string;
+  readonly to: string;
+}
 
-const LinkButton: React.FC<Props> = ({
-  activeClassName,
-  children,
-  className,
-  to,
-}) => (
-  <StyledButton
-    activeClassName={activeClassName}
-    as={Link}
-    className={className}
-    to={to}
-  >
-    {children}
-  </StyledButton>
-);
-
-export default LinkButton;
+export default function LinkButton(props: Props) {
+  return (
+    <StyledButton
+      activeClassName={props.activeClassName}
+      as={Link}
+      className={props.className}
+      to={props.to}
+    >
+      {props.children}
+    </StyledButton>
+  );
+}

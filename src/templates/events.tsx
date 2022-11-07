@@ -1,10 +1,11 @@
 import { graphql } from 'gatsby';
-import { FixedObject } from 'gatsby-image';
 import React from 'react';
 import styled from 'styled-components';
 
 import CenteredTextColumn from '../components/CenteredTextColumn';
-import EventCardList from '../components/EventCardList';
+import EventCardList, {
+  Props as EventCardListProps,
+} from '../components/EventCardList';
 import Layout from '../components/Layout';
 import Lead from '../components/Lead';
 import Pagination from '../components/Pagination';
@@ -24,9 +25,7 @@ export const query = graphql`
           id
           image {
             description
-            fixed(height: 72, width: 72) {
-              ...GatsbyContentfulFixed
-            }
+            gatsbyImageData(height: 72, layout: FIXED, quality: 100, width: 72)
           }
           slug
           title
@@ -59,46 +58,37 @@ const StyledPagination = styled(Pagination)`
   margin-bottom: calc(6 * ${baseline});
 `;
 
-type Props = {
-  data: {
-    allContentfulEvent: {
-      edges: {
-        node: {
-          date: string;
-          id: string;
-          image?: {
-            description?: string;
-            fixed: FixedObject;
-          };
-          slug: string;
-          title: string;
-        };
+export interface Props {
+  readonly data: {
+    readonly allContentfulEvent: {
+      readonly edges: {
+        readonly node: EventCardListProps['events'][number];
       }[];
     };
   };
-  pageContext: {
-    pageIsIndex?: boolean;
-    pageNumber: number;
-    totalPages: number;
+  readonly pageContext: {
+    readonly pageIsIndex?: boolean;
+    readonly pageNumber: number;
+    readonly totalPages: number;
   };
-};
+}
 
-const EventsPageTemplate: React.FC<Props> = ({ data, pageContext }) => {
-  const events = data.allContentfulEvent.edges.map(({ node }) => node);
+export default function EventsPageTemplate(props: Props) {
+  const events = props.data.allContentfulEvent.edges.map(({ node }) => node);
 
   return (
     <>
       <SEO
         title={
-          pageContext.pageIsIndex
+          props.pageContext.pageIsIndex
             ? 'Events'
-            : `Events: Page ${pageContext.pageNumber}`
+            : `Events: Page ${props.pageContext.pageNumber}`
         }
       />
       <Layout>
         <h1>Events</h1>
         <CenteredTextColumn>
-          {pageContext.pageIsIndex ? (
+          {props.pageContext.pageIsIndex ? (
             <>
               <Lead>We are more than just Sunday morning.</Lead>
               <p>
@@ -107,7 +97,7 @@ const EventsPageTemplate: React.FC<Props> = ({ data, pageContext }) => {
               </p>
             </>
           ) : (
-            <Lead>Page {pageContext.pageNumber}</Lead>
+            <Lead>Page {props.pageContext.pageNumber}</Lead>
           )}
           <p>Click on an event to see details.</p>
         </CenteredTextColumn>
@@ -119,11 +109,11 @@ const EventsPageTemplate: React.FC<Props> = ({ data, pageContext }) => {
             Check back soon!
           </NoEventsNotice>
         )}
-        {pageContext.totalPages > 1 && (
+        {props.pageContext.totalPages > 1 && (
           <CenteredTextColumn>
             <StyledPagination
-              lastPageNumber={pageContext.totalPages}
-              pageNumber={pageContext.pageNumber}
+              lastPageNumber={props.pageContext.totalPages}
+              pageNumber={props.pageContext.pageNumber}
               urlRoot="events"
             />
           </CenteredTextColumn>
@@ -131,6 +121,4 @@ const EventsPageTemplate: React.FC<Props> = ({ data, pageContext }) => {
       </Layout>
     </>
   );
-};
-
-export default EventsPageTemplate;
+}

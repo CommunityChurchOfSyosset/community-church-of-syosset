@@ -1,8 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import EmbeddedContentFrame from './EmbeddedContentFrame';
+import EmbeddedContentFrame, {
+  Props as EmbeddedContentFrameProps,
+} from './EmbeddedContentFrame';
 import { color } from '../style';
+
+const ROOT_URL = 'https://www.google.com/maps/embed/v1';
 
 const IFrame = styled.iframe`
   border: none;
@@ -17,39 +21,33 @@ const StyledEmbeddedContentFrame = styled(EmbeddedContentFrame)`
   background-color: ${color.lightGray};
 `;
 
-export type Props = {
-  apiKey: string;
-  aspectRatio: {
-    x: number;
-    y: number;
-  };
-  className?: string;
-  mode: string;
-  q?: string;
-  title: string;
-};
+export interface Props {
+  readonly apiKey: string;
+  readonly aspectRatio: EmbeddedContentFrameProps['aspectRatio'];
+  readonly className?: string;
+  readonly mode: string;
+  readonly q?: string;
+  readonly title: string;
+}
 
-const EmbeddedGoogleMap: React.FC<Props> = ({
-  apiKey,
-  aspectRatio,
-  className,
-  mode,
-  q,
-  title,
-}) => (
-  <StyledEmbeddedContentFrame aspectRatio={aspectRatio} className={className}>
-    <IFrame
-      src={`https://www.google.com/maps/embed/v1/${mode}?key=${apiKey}${
-        q ? `&q=${encodeURI(q)}` : ''
-      }`}
-      title={title}
+export default function EmbeddedGoogleMap(props: Props) {
+  let src = `${ROOT_URL}/${props.mode}?key=${props.apiKey}`;
+
+  if (props.q) {
+    src += `&q=${encodeURI(props.q)}`;
+  }
+
+  return (
+    <StyledEmbeddedContentFrame
+      aspectRatio={props.aspectRatio}
+      className={props.className}
     >
-      <p>
-        This embedded Google map cannot be shown because our browser does not
-        support HTML <code>iframe</code> elements.
-      </p>
-    </IFrame>
-  </StyledEmbeddedContentFrame>
-);
-
-export default EmbeddedGoogleMap;
+      <IFrame src={src} title={props.title}>
+        <p>
+          This embedded Google map cannot be shown because our browser does not
+          support HTML <code>iframe</code> elements.
+        </p>
+      </IFrame>
+    </StyledEmbeddedContentFrame>
+  );
+}

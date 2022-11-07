@@ -1,6 +1,10 @@
-import { documentToReactComponents } from '@contentful/rich-text-react-renderer';
-import { Document } from '@contentful/rich-text-types';
 import { graphql } from 'gatsby';
+import { GatsbyImage } from 'gatsby-plugin-image';
+import {
+  ContentfulRichTextGatsbyReference,
+  renderRichText,
+  RenderRichTextData,
+} from 'gatsby-source-contentful/rich-text';
 import React from 'react';
 import styled from 'styled-components';
 
@@ -17,21 +21,29 @@ export const query = graphql`
     contentfulEvent(id: { eq: $id }) {
       date
       details {
-        json
+        raw
+        references {
+          ... on ContentfulAsset {
+            contentful_id
+            __typename
+            description
+            gatsbyImageData(layout: CONSTRAINED)
+          }
+        }
       }
       title
     }
   }
 `;
 
-const DATE_FORMAT_OPTIONS = {
+const DATE_FORMAT_OPTIONS: Intl.DateTimeFormatOptions = {
   day: 'numeric',
   month: 'long',
   weekday: 'long',
   year: 'numeric',
 };
 
-const TIME_FORMAT_OPTIONS = {
+const TIME_FORMAT_OPTIONS: Intl.DateTimeFormatOptions = {
   hour: 'numeric',
   minute: '2-digit',
   timeZoneName: 'short',
@@ -47,32 +59,30 @@ const StyledPageButtons = styled(PageButtons)`
   margin-bottom: calc(6 * ${baseline});
 `;
 
-type Props = {
-  data: {
-    contentfulEvent: {
-      date: string;
-      details?: {
-        json: Document;
-      };
-      title: string;
+export interface Props {
+  readonly data: {
+    readonly contentfulEvent: {
+      readonly date: string;
+      readonly details?: RenderRichTextData<ContentfulRichTextGatsbyReference>;
+      readonly title: string;
     };
   };
-  pageContext: {
-    address?: {
-      city: string;
-      number: string;
-      state: string;
-      street: string;
-      zip: string;
+  readonly pageContext: {
+    readonly address?: {
+      readonly city: string;
+      readonly number: string;
+      readonly state: string;
+      readonly street: string;
+      readonly zip: string;
     };
-    nextSlug?: string;
-    placeId?: string;
-    prevSlug?: string;
+    readonly nextSlug?: string;
+    readonly placeId?: string;
+    readonly prevSlug?: string;
   };
-};
+}
 
-const EventTemplate: React.FC<Props> = ({ data, pageContext }) => {
-  const dateObject = new Date(data.contentfulEvent.date);
+export default function EventTemplate(props: Props) {
+  const dateObject = new Date(props.data.contentfulEvent.date);
 
   const dateString = dateObject.toLocaleDateString(
     undefined,
@@ -86,14 +96,14 @@ const EventTemplate: React.FC<Props> = ({ data, pageContext }) => {
 
   return (
     <>
-      <SEO title={data.contentfulEvent.title} />
+      <SEO title={props.data.contentfulEvent.title} />
       <Layout>
         <CenteredTextColumn>
-          <h1>{data.contentfulEvent.title}</h1>
+          <h1>{props.data.contentfulEvent.title}</h1>
           <section>
             <h2>Date and time</h2>
             <p>
-              <time dateTime={data.contentfulEvent.date}>
+              <time dateTime={props.data.contentfulEvent.date}>
                 {dateString} <br />
                 {timeString}
               </time>
@@ -102,35 +112,47 @@ const EventTemplate: React.FC<Props> = ({ data, pageContext }) => {
           <section>
             <h2>Location</h2>
             {process.env.GATSBY_GOOGLE_MAPS_EMBED_API_KEY &&
-              pageContext.placeId && (
+              props.pageContext.placeId && (
                 <StyledEmbeddedGoogleMap
                   apiKey={process.env.GATSBY_GOOGLE_MAPS_EMBED_API_KEY}
                   aspectRatio={{ x: 1, y: 1 }}
                   mode="place"
-                  q={`place_id:${pageContext.placeId}`}
+                  q={`place_id:${props.pageContext.placeId}`}
                   title="A map of the event location"
                 />
               )}
-            {pageContext.address && (
+            {props.pageContext.address && (
               <p>
-                {pageContext.address.number} {pageContext.address.street} <br />
-                {pageContext.address.city}, {pageContext.address.state}{' '}
-                {pageContext.address.zip}
+                {props.pageContext.address.number}{' '}
+                {props.pageContext.address.street} <br />
+                {props.pageContext.address.city},{' '}
+                {props.pageContext.address.state}{' '}
+                {props.pageContext.address.zip}
               </p>
             )}
             <address></address>
           </section>
-          {data.contentfulEvent.details && (
+          {props.data.contentfulEvent.details && (
             <section>
               <h2>Details</h2>
-              {documentToReactComponents(data.contentfulEvent.details.json)}
+              {renderRichText(props.data.contentfulEvent.details, {
+                renderNode: {
+                  'embedded-asset-block': node =>
+                    node.data.target.gatsbyImageData ? (
+                      <GatsbyImage
+                        alt={node.data.target.description}
+                        image={node.data.target.gatsbyImageData}
+                      />
+                    ) : null,
+                },
+              })}
             </section>
           )}
           <ShareSection contentType="event" />
-          {(pageContext.nextSlug || pageContext.prevSlug) && (
+          {(props.pageContext.nextSlug || props.pageContext.prevSlug) && (
             <StyledPageButtons
-              nextSlug={pageContext.nextSlug}
-              prevSlug={pageContext.prevSlug}
+              nextSlug={props.pageContext.nextSlug}
+              prevSlug={props.pageContext.prevSlug}
               rootSlug="events"
             />
           )}
@@ -138,6 +160,4 @@ const EventTemplate: React.FC<Props> = ({ data, pageContext }) => {
       </Layout>
     </>
   );
-};
-
-export default EventTemplate;
+}

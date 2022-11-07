@@ -1,7 +1,10 @@
-import { Document } from '@contentful/rich-text-types';
-import { documentToReactComponents } from '@contentful/rich-text-react-renderer';
 import { graphql, useStaticQuery } from 'gatsby';
-import { FluidObject } from 'gatsby-image';
+import { GatsbyImage, IGatsbyImageData } from 'gatsby-plugin-image';
+import {
+  ContentfulRichTextGatsbyReference,
+  renderRichText,
+  RenderRichTextData,
+} from 'gatsby-source-contentful/rich-text';
 import React, { useState } from 'react';
 import styled from 'styled-components';
 
@@ -53,36 +56,42 @@ const StyledLinkButton = styled(LinkButton)`
   }
 `;
 
-type Data = {
-  alert?: {
-    content: {
-      json: Document;
-    } | null;
+interface Data {
+  readonly alert?: {
+    readonly content: RenderRichTextData<
+      ContentfulRichTextGatsbyReference
+    > | null;
   };
-  backgroundImage?: {
-    fluid: FluidObject;
+  readonly backgroundImage?: {
+    readonly gatsbyImageData: IGatsbyImageData;
   };
-  backgroundVideo?: {
-    file: {
-      url: string;
+  readonly backgroundVideo?: {
+    readonly file: {
+      readonly url: string;
     };
   };
-};
+}
 
-const HomePage: React.FC = () => {
+export default function HomePage() {
   const data = useStaticQuery<Data>(graphql`
     query HomePage {
       alert: contentfulMessage(title: { eq: "Homepage Alert" }) {
         content {
-          json
+          raw
+          references {
+            ... on ContentfulAsset {
+              contentful_id
+              __typename
+              description
+              gatsbyImageData(layout: CONSTRAINED)
+            }
+          }
         }
       }
       backgroundImage: contentfulAsset(
         title: { eq: "Homepage Background Image" }
       ) {
-        fluid {
-          ...GatsbyContentfulFluid
-        }
+        gatsbyImageData(layout: FULL_WIDTH)
       }
       backgroundVideo: contentfulAsset(
         title: { eq: "Homepage Background Video" }
@@ -99,7 +108,7 @@ const HomePage: React.FC = () => {
   const backgroundImageStack = data.backgroundImage
     ? [
         'linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5))',
-        data.backgroundImage.fluid,
+        data.backgroundImage.gatsbyImageData,
       ]
     : ['linear-gradient(rgba(0, 191, 255, 1), rgba(0, 191, 255, 1))'];
 
@@ -111,7 +120,17 @@ const HomePage: React.FC = () => {
           isShown={alertIsShown}
           onDismiss={() => handleModalDismiss(setAlertIsShown)}
         >
-          {documentToReactComponents(data.alert.content.json)}
+          {renderRichText(data.alert.content, {
+            renderNode: {
+              'embedded-asset-block': node =>
+                node.data.target.gatsbyImageData ? (
+                  <GatsbyImage
+                    alt={node.data.target.description}
+                    image={node.data.target.gatsbyImageData}
+                  />
+                ) : null,
+            },
+          })}
         </Modal>
       )}
       <StyledLayout
@@ -143,12 +162,10 @@ const HomePage: React.FC = () => {
       </StyledLayout>
     </>
   );
-};
+}
 
 function handleModalDismiss(
   setAlertIsShown: React.Dispatch<React.SetStateAction<boolean>>
 ) {
   setAlertIsShown(false);
 }
-
-export default HomePage;

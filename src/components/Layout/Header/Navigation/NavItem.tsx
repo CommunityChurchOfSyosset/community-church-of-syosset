@@ -4,8 +4,8 @@ import styled from 'styled-components';
 
 import { baseline, color } from '../../../../style';
 
-type ListItemProps = {
-  borderBreakpoint: string;
+interface ListItemProps {
+  readonly borderBreakpoint: string;
 }
 
 const ListItem = styled.li<ListItemProps>`
@@ -16,11 +16,11 @@ const ListItem = styled.li<ListItemProps>`
   }
 `;
 
-type StyledLinkProps = {
-  layoutBreakpoint: string;
+interface StyledLinkProps {
+  readonly layoutBreakpoint: string;
 }
 
-const StyledLink = styled(Link) <StyledLinkProps>`
+const StyledLink = styled(Link)<StyledLinkProps>`
   background-color: ${color.white};
   display: block;
   padding: calc(2 * ${baseline});
@@ -38,19 +38,26 @@ const StyledLink = styled(Link) <StyledLinkProps>`
   }
 `;
 
-type Props = {
-  children: React.ReactNode;
-  className?: string;
-  layoutBreakpoint: string;
-  to: string;
-};
+export interface Props {
+  readonly children: React.ReactNode;
+  readonly className?: string;
+  readonly layoutBreakpoint: string;
+  readonly to: string;
+}
 
-const NavItem: React.FC<Props> = ({ children, className, layoutBreakpoint, to }) => (
-  <ListItem borderBreakpoint={layoutBreakpoint} className={className}>
-    <StyledLink activeClassName="active" layoutBreakpoint={layoutBreakpoint} to={to}>
-      {children}
-    </StyledLink>
-  </ListItem>
-);
-
-export default NavItem;
+export default function NavItem(props: Props) {
+  return (
+    <ListItem
+      borderBreakpoint={props.layoutBreakpoint}
+      className={props.className}
+    >
+      <StyledLink
+        activeClassName="active"
+        layoutBreakpoint={props.layoutBreakpoint}
+        to={props.to}
+      >
+        {props.children}
+      </StyledLink>
+    </ListItem>
+  );
+}

@@ -21,7 +21,7 @@ const StyledLinkButton = styled(LinkButton)`
   margin-bottom: calc(6 * ${baseline});
 `;
 
-type Data = {
+interface Data {
   readonly contentfulJsonObject: {
     readonly json: {
       readonly socialMedia: {
@@ -31,22 +31,22 @@ type Data = {
       };
     };
   };
-};
+}
 
-const VisitPage: React.FC = () => {
+export default function VisitPage() {
   const data = useStaticQuery<Data>(graphql`
-  query VisitPage {
-    contentfulJsonObject(title: { eq: "Website Data" }) {
-      json {
-        socialMedia {
-          facebook {
-            slug
+    query VisitPage {
+      contentfulJsonObject(title: { eq: "Website Data" }) {
+        json {
+          socialMedia {
+            facebook {
+              slug
+            }
           }
         }
       }
     }
-  }
-`);
+  `);
 
   return (
     <>
@@ -63,17 +63,26 @@ const VisitPage: React.FC = () => {
             <p>
               Our <time dateTime="10:00">10:00 AM</time> Sunday worship service
               features hymnody, anthems sung by the chancel choir, scripture
-              lessons, biblical preaching, and more. Prayer requests are welcomed
-              from all in attendance. In our tradition, all baptized members of
-              the Christian family are invited to receive communion on the first
-              Sunday of each month.
+              lessons, biblical preaching, and more. Prayer requests are
+              welcomed from all in attendance. In our tradition, all baptized
+              members of the Christian family are invited to receive communion
+              on the first Sunday of each month.
             </p>
             <p>
               Worship is a time of renewal and refreshment. After the service we
-              share fellowship with food and refreshment, and take an opportunity
-              to build our friendships.
+              share fellowship with food and refreshment, and take an
+              opportunity to build our friendships.
             </p>
-            <p>If you are unable to join us in person, our services are streamed live on <ExternalLink href={`https://www.facebook.com/${data.contentfulJsonObject.json.socialMedia.facebook.slug}`}>Facebook</ExternalLink>.</p>
+            <p>
+              If you are unable to join us in person, our services are streamed
+              live on{' '}
+              <ExternalLink
+                href={`https://www.facebook.com/${data.contentfulJsonObject.json.socialMedia.facebook.slug}`}
+              >
+                Facebook
+              </ExternalLink>
+              .
+            </p>
           </section>
           <section>
             <h2>Location</h2>
@@ -97,8 +106,8 @@ const VisitPage: React.FC = () => {
           <section>
             <h2>Let us know you’re coming</h2>
             <p>
-              We are looking forward to meeting you! Drop us a note and we will be
-              eager to welcome you on your first visit.
+              We are looking forward to meeting you! Drop us a note and we will
+              be eager to welcome you on your first visit.
             </p>
             <StyledLinkButton to="/contact">Contact us</StyledLinkButton>
           </section>
@@ -106,6 +115,4 @@ const VisitPage: React.FC = () => {
       </Layout>
     </>
   );
-};
-
-export default VisitPage;
+}

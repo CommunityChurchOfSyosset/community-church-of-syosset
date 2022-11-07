@@ -1,5 +1,5 @@
 import { graphql, Link } from 'gatsby';
-import Image, { FixedObject } from 'gatsby-image';
+import { GatsbyImage, IGatsbyImageData } from 'gatsby-plugin-image';
 import React from 'react';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -20,9 +20,7 @@ export const query = graphql`
       preacher {
         image {
           description
-          fixed(height: 48, width: 48) {
-            ...GatsbyContentfulFixed
-          }
+          gatsbyImageData(height: 48, layout: FIXED, quality: 100, width: 48)
         }
         name
         role
@@ -35,7 +33,7 @@ export const query = graphql`
   }
 `;
 
-const DATE_FORMAT_OPTIONS = {
+const DATE_FORMAT_OPTIONS: Intl.DateTimeFormatOptions = {
   day: 'numeric',
   month: 'long',
   weekday: 'long',
@@ -66,7 +64,7 @@ const StyledFontAwesomeIcon = styled(FontAwesomeIcon)`
   font-size: calc(9 * ${baseline});
 `;
 
-const StyledImage = styled(Image)`
+const StyledImage = styled(GatsbyImage)`
   border-radius: ${baseline};
   margin-right: calc(3 * ${baseline});
 `;
@@ -84,33 +82,34 @@ const StyledVideoPlayer = styled(VideoPlayer)`
   margin: calc(6 * ${baseline}) 0;
 `;
 
-type Props = {
-  data: {
-    contentfulService: {
-      date: string;
-      preacher: {
-        image?: {
-          description?: string;
-          fixed: FixedObject;
+export interface Props {
+  readonly data: {
+    readonly contentfulService: {
+      readonly date: string;
+      readonly preacher: {
+        readonly image?: {
+          readonly description?: string;
+          readonly gatsbyImageData: IGatsbyImageData;
         };
-        name: string;
-        role: string;
-        slug: string;
+        readonly name: string;
+        readonly role: string;
+        readonly slug: string;
       };
-      scriptureReadings: string[];
-      title: string;
-      videoUrl: string;
+      readonly scriptureReadings: readonly string[];
+      readonly title: string;
+      readonly videoUrl: string;
     };
   };
-  pageContext: {
-    nextSlug?: string;
-    prevSlug?: string;
+  readonly pageContext: {
+    readonly nextSlug?: string;
+    readonly prevSlug?: string;
   };
-};
+}
 
-const ServiceTemplate: React.FC<Props> = ({ data, pageContext }) => {
-  const [year, month, day] = data.contentfulService.date.split('-');
+export default function ServiceTemplate(props: Props) {
+  const [year, month, day] = props.data.contentfulService.date.split('-');
   const dateObject = new Date(+year, +month - 1, +day);
+
   const dateString = dateObject.toLocaleDateString(
     undefined,
     DATE_FORMAT_OPTIONS
@@ -118,16 +117,21 @@ const ServiceTemplate: React.FC<Props> = ({ data, pageContext }) => {
 
   return (
     <>
-      <SEO title={data.contentfulService.title} />
+      <SEO title={props.data.contentfulService.title} />
       <Layout>
-        <h1>{data.contentfulService.title}</h1>
+        <h1>{props.data.contentfulService.title}</h1>
         <CenteredTextColumn>
-          <Link to={`/people/${data.contentfulService.preacher.slug}`}>
+          <Link to={`/people/${props.data.contentfulService.preacher.slug}`}>
             <Preacher>
-              {data.contentfulService.preacher.image ? (
+              {props.data.contentfulService.preacher.image ? (
                 <StyledImage
-                  alt={data.contentfulService.preacher.image.description}
-                  fixed={data.contentfulService.preacher.image.fixed}
+                  alt={
+                    props.data.contentfulService.preacher.image.description ||
+                    ''
+                  }
+                  image={
+                    props.data.contentfulService.preacher.image.gatsbyImageData
+                  }
                 />
               ) : (
                 <IconFrame>
@@ -135,23 +139,25 @@ const ServiceTemplate: React.FC<Props> = ({ data, pageContext }) => {
                 </IconFrame>
               )}
               <PreacherDetails>
-                <b>{data.contentfulService.preacher.name}</b> <br />
-                {data.contentfulService.preacher.role}
+                <b>{props.data.contentfulService.preacher.name}</b> <br />
+                {props.data.contentfulService.preacher.role}
               </PreacherDetails>
             </Preacher>
           </Link>
           <p>
-            <time dateTime={data.contentfulService.date}>{dateString}</time>
+            <time dateTime={props.data.contentfulService.date}>
+              {dateString}
+            </time>
           </p>
           <StyledTitledList title="Scripture readings" type="unordered">
-            {data.contentfulService.scriptureReadings}
+            {props.data.contentfulService.scriptureReadings}
           </StyledTitledList>
-          <StyledVideoPlayer url={data.contentfulService.videoUrl} />
+          <StyledVideoPlayer url={props.data.contentfulService.videoUrl} />
           <ShareSection contentType="service" />
-          {(pageContext.nextSlug || pageContext.prevSlug) && (
+          {(props.pageContext.nextSlug || props.pageContext.prevSlug) && (
             <StyledPageButtons
-              nextSlug={pageContext.nextSlug}
-              prevSlug={pageContext.prevSlug}
+              nextSlug={props.pageContext.nextSlug}
+              prevSlug={props.pageContext.prevSlug}
               rootSlug="services"
             />
           )}
@@ -159,6 +165,4 @@ const ServiceTemplate: React.FC<Props> = ({ data, pageContext }) => {
       </Layout>
     </>
   );
-};
-
-export default ServiceTemplate;
+}

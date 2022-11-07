@@ -1,5 +1,4 @@
 import { graphql } from 'gatsby';
-import { FixedObject } from 'gatsby-image';
 import React from 'react';
 import styled from 'styled-components';
 
@@ -8,7 +7,9 @@ import Layout from '../components/Layout';
 import Lead from '../components/Lead';
 import Pagination from '../components/Pagination';
 import SEO from '../components/SEO';
-import ServiceCardList from '../components/ServiceCardList';
+import ServiceCardList, {
+  Props as ServiceCardListProps,
+} from '../components/ServiceCardList';
 import { baseline, breakpoint } from '../style';
 
 export const query = graphql`
@@ -24,9 +25,7 @@ export const query = graphql`
           id
           image {
             description
-            fixed(height: 72, width: 72) {
-              ...GatsbyContentfulFixed
-            }
+            gatsbyImageData(height: 72, layout: FIXED, quality: 100, width: 72)
           }
           preacher {
             name
@@ -60,55 +59,45 @@ const StyledServiceCardList = styled(ServiceCardList)`
   }
 `;
 
-type Props = {
-  data: {
-    allContentfulService: {
-      edges: {
-        node: {
-          date: string;
-          id: string;
-          image?: {
-            description?: string;
-            fixed: FixedObject;
-          };
-          preacher: {
-            name: string;
-          };
-          slug: string;
-          title: string;
-        };
+export interface Props {
+  readonly data: {
+    readonly allContentfulService: {
+      readonly edges: readonly {
+        readonly node: ServiceCardListProps['services'][number];
       }[];
     };
   };
-  pageContext: {
-    pageIsIndex?: boolean;
-    pageNumber: number;
-    totalPages: number;
+  readonly pageContext: {
+    readonly pageIsIndex?: boolean;
+    readonly pageNumber: number;
+    readonly totalPages: number;
   };
-};
+}
 
-const ServicesPageTemplate: React.FC<Props> = ({ data, pageContext }) => {
-  const services = data.allContentfulService.edges.map(({ node }) => node);
+export default function ServicesPageTemplate(props: Props) {
+  const services = props.data.allContentfulService.edges.map(
+    ({ node }) => node
+  );
 
   return (
     <>
       <SEO
         title={
-          pageContext.pageIsIndex
+          props.pageContext.pageIsIndex
             ? 'Services'
-            : `Services: Page ${pageContext.pageNumber}`
+            : `Services: Page ${props.pageContext.pageNumber}`
         }
       />
       <Layout>
         <h1>Services</h1>
         <CenteredTextColumn>
-          {pageContext.pageIsIndex ? (
+          {props.pageContext.pageIsIndex ? (
             <p>
               Miss a Sunday? Want to hear what our pastor and guest preachers
               have to say?
             </p>
           ) : (
-            <Lead>Page {pageContext.pageNumber}</Lead>
+            <Lead>Page {props.pageContext.pageNumber}</Lead>
           )}
           <p>Click on a past service to watch it and learn more.</p>
         </CenteredTextColumn>
@@ -120,11 +109,11 @@ const ServicesPageTemplate: React.FC<Props> = ({ data, pageContext }) => {
             Check back soon!
           </NoServicesNotice>
         )}
-        {pageContext.totalPages > 1 && (
+        {props.pageContext.totalPages > 1 && (
           <CenteredTextColumn>
             <StyledPagination
-              lastPageNumber={pageContext.totalPages}
-              pageNumber={pageContext.pageNumber}
+              lastPageNumber={props.pageContext.totalPages}
+              pageNumber={props.pageContext.pageNumber}
               urlRoot="services"
             />
           </CenteredTextColumn>
@@ -132,6 +121,4 @@ const ServicesPageTemplate: React.FC<Props> = ({ data, pageContext }) => {
       </Layout>
     </>
   );
-};
-
-export default ServicesPageTemplate;
+}

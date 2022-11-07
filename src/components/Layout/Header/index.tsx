@@ -6,8 +6,8 @@ import Navigation from './Navigation';
 import CCSLogo from '../../CCSLogo';
 import { baseline, color } from '../../../style';
 
-type ContainerProps = {
-  paddingBreakpoint: string;
+interface ContainerProps {
+  readonly paddingBreakpoint: string;
 }
 
 const Container = styled.header<ContainerProps>`
@@ -28,18 +28,21 @@ const StyledCCSLogo = styled(CCSLogo)`
   height: calc(9 * ${baseline});
 `;
 
-type Props = {
-  className?: string;
-  layoutBreakpoint: string;
-};
+export interface Props {
+  readonly className?: string;
+  readonly layoutBreakpoint: string;
+}
 
-const Header: React.FC<Props> = ({ className, layoutBreakpoint }) => (
-  <Container className={className} paddingBreakpoint={layoutBreakpoint}>
-    <StyledBrand layoutBreakpoint={layoutBreakpoint}>
-      <StyledCCSLogo />
-    </StyledBrand>
-    <Navigation toggleBreakpoint={layoutBreakpoint} />
-  </Container>
-);
-
-export default Header;
+export default function Header(props: Props) {
+  return (
+    <Container
+      className={props.className}
+      paddingBreakpoint={props.layoutBreakpoint}
+    >
+      <StyledBrand layoutBreakpoint={props.layoutBreakpoint}>
+        <StyledCCSLogo />
+      </StyledBrand>
+      <Navigation toggleBreakpoint={props.layoutBreakpoint} />
+    </Container>
+  );
+}

@@ -1,8 +1,7 @@
-import { FixedObject } from 'gatsby-image';
 import React from 'react';
 import styled from 'styled-components';
 
-import EventCard from '../components/EventCard';
+import EventCard, { Props as EventCardProps } from '../components/EventCard';
 import { baseline, breakpoint, color } from '../style';
 
 const ListItem = styled.li`
@@ -22,22 +21,21 @@ const UnorderedList = styled.ul`
   padding-left: 0;
 `;
 
-export type Props = {
-  className?: string;
-  events: {
-    date: string;
-    id: string;
-    image?: {
-      description?: string;
-      fixed: FixedObject;
-    };
-    slug: string;
-    title: string;
-  }[];
-};
+interface Event {
+  readonly date: string;
+  readonly id: string;
+  readonly image: EventCardProps['image'];
+  readonly slug: string;
+  readonly title: string;
+}
 
-const EventCardList: React.FC<Props> = ({ className, events }) => {
-  const eventCards = events.map(event => (
+export interface Props {
+  readonly className?: string;
+  readonly events: Event[];
+}
+
+export default function EventCardList(props: Props) {
+  const eventCards = props.events.map(event => (
     <ListItem key={event.id}>
       <StyledEventCard
         date={event.date}
@@ -48,7 +46,7 @@ const EventCardList: React.FC<Props> = ({ className, events }) => {
     </ListItem>
   ));
 
-  return <UnorderedList className={className}>{eventCards}</UnorderedList>;
-};
-
-export default EventCardList;
+  return (
+    <UnorderedList className={props.className}>{eventCards}</UnorderedList>
+  );
+}

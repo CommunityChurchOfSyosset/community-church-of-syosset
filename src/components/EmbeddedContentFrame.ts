@@ -1,11 +1,11 @@
 import styled from 'styled-components';
 
-type Props = {
-  aspectRatio: {
-    x: number;
-    y: number;
+export interface Props {
+  readonly aspectRatio: {
+    readonly x: number;
+    readonly y: number;
   };
-};
+}
 
 const EmbeddedContentFrame = styled.div<Props>`
   overflow: hidden;

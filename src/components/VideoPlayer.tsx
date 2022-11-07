@@ -31,48 +31,54 @@ const Video = styled.video`
   width: 100%;
 `;
 
-type Props = {
-  className?: string;
-  url: string;
-};
+export interface Props {
+  readonly className?: string;
+  readonly url: string;
+}
 
-type AspectRatio = {
-  x: number;
-  y: number;
-};
+interface AspectRatio {
+  readonly x: number;
+  readonly y: number;
+}
 
-const VideoPlayer: React.FC<Props> = ({ className, url }) => {
+export default function VideoPlayer(props: Props) {
   const [aspectRatio, setAspectRatio] = useState<AspectRatio>({ x: 1, y: 1 });
-
   useEffect(() => listenForLoadedmetadata(setAspectRatio), []);
 
-  return url.includes('www.youtube.com/embed') ? (
-    <StyledEmbeddedContentFrame
-      aspectRatio={{ x: 16, y: 9 }}
-      className={className}
-    >
-      <Iframe
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowFullScreen
-        src={url}
+  if (props.url.includes('www.youtube.com/embed')) {
+    return (
+      <StyledEmbeddedContentFrame
+        aspectRatio={{ x: 16, y: 9 }}
+        className={props.className}
       >
-        <FallbackParagraph>
-          Your browser does not support the HTML <code>&lt;iframe&gt;</code>{' '}
-          element.{' '}
-          <ExternalLink href={url}>
-            Click here to watch this video on YouTube
-          </ExternalLink>
-          .
-        </FallbackParagraph>
-      </Iframe>
-    </StyledEmbeddedContentFrame>
-  ) : (
-    <StyledEmbeddedContentFrame aspectRatio={aspectRatio} className={className}>
-      <Video controls preload="metadata" src={url}>
+        <Iframe
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+          src={props.url}
+        >
+          <FallbackParagraph>
+            Your browser does not support the HTML <code>&lt;iframe&gt;</code>{' '}
+            element.{' '}
+            <ExternalLink href={props.url}>
+              Click here to watch this video on YouTube
+            </ExternalLink>
+            .
+          </FallbackParagraph>
+        </Iframe>
+      </StyledEmbeddedContentFrame>
+    );
+  }
+
+  return (
+    <StyledEmbeddedContentFrame
+      aspectRatio={aspectRatio}
+      className={props.className}
+    >
+      <Video controls preload="metadata" src={props.url}>
         <FallbackParagraph>
           Your browser does not support the HTML <code>&lt;video&gt;</code>{' '}
           element.{' '}
-          <ExternalLink download href={url}>
+          <ExternalLink download href={props.url}>
             Click here to download this video
           </ExternalLink>
           .
@@ -80,9 +86,7 @@ const VideoPlayer: React.FC<Props> = ({ className, url }) => {
       </Video>
     </StyledEmbeddedContentFrame>
   );
-};
-
-export default VideoPlayer;
+}
 
 function listenForLoadedmetadata(
   setAspectRatio: React.Dispatch<React.SetStateAction<AspectRatio>>

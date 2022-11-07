@@ -4,8 +4,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { color, typography } from '../../../../style';
 
-type ButtonProps = {
-  displayBreakpoint: string;
+interface ButtonProps {
+  readonly displayBreakpoint: string;
 }
 
 const Button = styled.button<ButtonProps>`
@@ -29,31 +29,30 @@ const Button = styled.button<ButtonProps>`
   }
 `;
 
-type Props = {
-  displayBreakpoint: string;
-  navListIsShown: boolean;
-  setNavListIsHiding: React.Dispatch<React.SetStateAction<boolean>>;
-  setNavListIsShown: React.Dispatch<React.SetStateAction<boolean>>;
-};
+export interface Props {
+  readonly displayBreakpoint: string;
+  readonly navListIsShown: boolean;
+  readonly setNavListIsHiding: React.Dispatch<React.SetStateAction<boolean>>;
+  readonly setNavListIsShown: React.Dispatch<React.SetStateAction<boolean>>;
+}
 
-const NavListToggle: React.FC<Props> = ({
-  displayBreakpoint,
-  navListIsShown,
-  setNavListIsHiding,
-  setNavListIsShown,
-}) => (
-  <Button displayBreakpoint={displayBreakpoint}>
-    <FontAwesomeIcon
-      color={color.body}
-      icon={navListIsShown ? 'times' : 'bars'}
-      onClick={() =>
-        handleClick(navListIsShown, setNavListIsShown, setNavListIsHiding)
-      }
-    />
-  </Button>
-);
-
-export default NavListToggle;
+export default function NavListToggle(props: Props) {
+  return (
+    <Button displayBreakpoint={props.displayBreakpoint}>
+      <FontAwesomeIcon
+        color={color.body}
+        icon={props.navListIsShown ? 'times' : 'bars'}
+        onClick={() =>
+          handleClick(
+            props.navListIsShown,
+            props.setNavListIsShown,
+            props.setNavListIsHiding
+          )
+        }
+      />
+    </Button>
+  );
+}
 
 function handleClick(
   navListIsShown: boolean,
@@ -71,9 +70,6 @@ function hideNavList(
   setNavListIsHiding: React.Dispatch<React.SetStateAction<boolean>>
 ) {
   const TRANSITION_DURATION = 500;
-
   setNavListIsHiding(true);
-  setTimeout(() => {
-    setNavListIsHiding(false);
-  }, TRANSITION_DURATION);
+  setTimeout(() => setNavListIsHiding(false), TRANSITION_DURATION);
 }

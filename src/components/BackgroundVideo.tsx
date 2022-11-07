@@ -13,20 +13,20 @@ const Video = styled.video`
   z-index: -1;
 `;
 
-type Props = {
-  className?: string;
-  url: string;
-};
+export interface Props {
+  readonly className?: string;
+  readonly url: string;
+}
 
-const BackgroundVideo: React.FC<Props> = ({ className, url }) => (
-  <Video
-    autoPlay
-    className={className}
-    loop
-    muted
-    preload="metadata"
-    src={url}
-  />
-);
-
-export default BackgroundVideo;
+export default function BackgroundVideo(props: Props) {
+  return (
+    <Video
+      autoPlay
+      className={props.className}
+      loop
+      muted
+      preload="metadata"
+      src={props.url}
+    />
+  );
+}

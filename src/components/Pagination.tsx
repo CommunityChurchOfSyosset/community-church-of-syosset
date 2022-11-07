@@ -81,85 +81,81 @@ const StyledLinkButton = styled(LinkButton)`
   }
 `;
 
-type Props = {
-  className?: string;
-  lastPageNumber: number;
-  pageNumber: number;
-  urlRoot: string;
-};
+export interface Props {
+  readonly className?: string;
+  readonly lastPageNumber: number;
+  readonly pageNumber: number;
+  readonly urlRoot: string;
+}
 
-const Pagination: React.FC<Props> = ({
-  className,
-  lastPageNumber,
-  pageNumber,
-  urlRoot,
-}) => {
-  const [selectedPageNumber, setSelectedPageNumber] = useState();
+export default function Pagination(props: Props) {
+  const [selectedPageNumber, setSelectedPageNumber] = useState('');
+  const pageUrl = `/${props.urlRoot}/page`;
 
   return (
-    <Container className={className}>
+    <Container className={props.className}>
       <PageNumbersContainer>
-        {pageNumber > 1 && (
+        {props.pageNumber > 1 && (
           <>
-            <StyledLinkButton to={`/${urlRoot}/page/${pageNumber - 1}`}>
+            <StyledLinkButton to={`${pageUrl}/${props.pageNumber - 1}`}>
               <FontAwesomeIcon icon="chevron-left" />
             </StyledLinkButton>
-            <StyledLinkButton to={`/${urlRoot}/page/1`}>1</StyledLinkButton>
+            <StyledLinkButton to={`${pageUrl}/1`}>1</StyledLinkButton>
           </>
         )}
-        {pageNumber - 3 > 1 && <EllipsisContainer>…</EllipsisContainer>}
-        {pageNumber - 2 > 1 && (
-          <StyledLinkButton to={`/${urlRoot}/page/${pageNumber - 2}`}>
-            {pageNumber - 2}
+        {props.pageNumber - 3 > 1 && <EllipsisContainer>…</EllipsisContainer>}
+        {props.pageNumber - 2 > 1 && (
+          <StyledLinkButton to={`${pageUrl}/${props.pageNumber - 2}`}>
+            {props.pageNumber - 2}
           </StyledLinkButton>
         )}
-        {pageNumber - 1 > 1 && (
-          <StyledLinkButton to={`/${urlRoot}/page/${pageNumber - 1}`}>
-            {pageNumber - 1}
+        {props.pageNumber - 1 > 1 && (
+          <StyledLinkButton to={`${pageUrl}/${props.pageNumber - 1}`}>
+            {props.pageNumber - 1}
           </StyledLinkButton>
         )}
         <StyledLinkButton
           className="active"
-          to={`/${urlRoot}/page/${pageNumber}`}
+          to={`${pageUrl}/${props.pageNumber}`}
         >
-          {pageNumber}
+          {props.pageNumber}
         </StyledLinkButton>
-        {pageNumber + 1 < lastPageNumber && (
-          <StyledLinkButton to={`/${urlRoot}/page/${pageNumber + 1}`}>
-            {pageNumber + 1}
+        {props.pageNumber + 1 < props.lastPageNumber && (
+          <StyledLinkButton to={`${pageUrl}/${props.pageNumber + 1}`}>
+            {props.pageNumber + 1}
           </StyledLinkButton>
         )}
-        {pageNumber + 2 < lastPageNumber && (
-          <StyledLinkButton to={`/${urlRoot}/page/${pageNumber + 2}`}>
-            {pageNumber + 2}
+        {props.pageNumber + 2 < props.lastPageNumber && (
+          <StyledLinkButton to={`${pageUrl}/${props.pageNumber + 2}`}>
+            {props.pageNumber + 2}
           </StyledLinkButton>
         )}
-        {pageNumber + 3 < lastPageNumber && (
+        {props.pageNumber + 3 < props.lastPageNumber && (
           <EllipsisContainer>…</EllipsisContainer>
         )}
-        {pageNumber < lastPageNumber && (
+        {props.pageNumber < props.lastPageNumber && (
           <>
-            <StyledLinkButton to={`/${urlRoot}/page/${lastPageNumber}`}>
-              {lastPageNumber}
+            <StyledLinkButton to={`${pageUrl}/${props.lastPageNumber}`}>
+              {props.lastPageNumber}
             </StyledLinkButton>
-            <StyledLinkButton to={`/${urlRoot}/page/${pageNumber + 1}`}>
+            <StyledLinkButton to={`${pageUrl}/${props.pageNumber + 1}`}>
               <FontAwesomeIcon icon="chevron-right" />
             </StyledLinkButton>
           </>
         )}
       </PageNumbersContainer>
-      {lastPageNumber > 4 && (
+      {props.lastPageNumber > 4 && (
         <Form
-          onSubmit={event => handleSubmit(event, urlRoot, selectedPageNumber)}
+          onSubmit={event =>
+            handleSubmit(event, props.urlRoot, selectedPageNumber)
+          }
         >
           <StyledFormControl
             label="Go to page"
-            max={lastPageNumber}
+            max={props.lastPageNumber}
             min={1}
             name="go-to-page"
-            onChange={event => {
-              handleChange(event, setSelectedPageNumber);
-            }}
+            onChange={event => handleChange(event, setSelectedPageNumber)}
             required
             type="number"
             value={selectedPageNumber}
@@ -175,12 +171,10 @@ const Pagination: React.FC<Props> = ({
       )}
     </Container>
   );
-};
-
-export default Pagination;
+}
 
 function handleChange(
-  event: React.ChangeEvent<HTMLInputElement>,
+  event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   setState: React.Dispatch<React.SetStateAction<string>>
 ) {
   event.preventDefault();
@@ -190,7 +184,7 @@ function handleChange(
 function handleSubmit(
   event: React.FormEvent<HTMLFormElement>,
   slug: string,
-  pageNumber: number
+  pageNumber: string
 ) {
   event.preventDefault();
   navigate(`/${slug}/page/${pageNumber}`);

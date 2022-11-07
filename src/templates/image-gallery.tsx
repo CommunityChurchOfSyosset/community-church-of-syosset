@@ -1,9 +1,11 @@
-import { documentToReactComponents } from '@contentful/rich-text-react-renderer';
-import { Document } from '@contentful/rich-text-types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { graphql } from 'gatsby';
-import { FluidObject } from 'gatsby-image';
-import GatsbyImage from 'gatsby-image/withIEPolyfill';
+import { GatsbyImage, IGatsbyImageData } from 'gatsby-plugin-image';
+import {
+  ContentfulRichTextGatsbyReference,
+  renderRichText,
+  RenderRichTextData,
+} from 'gatsby-source-contentful/rich-text';
 import React, { useState } from 'react';
 import styled from 'styled-components';
 
@@ -18,7 +20,15 @@ export const query = graphql`
   query ImageGallery($id: String!) {
     contentfulImageGallery(id: { eq: $id }) {
       description {
-        json
+        raw
+        references {
+          ... on ContentfulAsset {
+            contentful_id
+            __typename
+            description
+            gatsbyImageData(layout: CONSTRAINED)
+          }
+        }
       }
       images {
         description
@@ -29,9 +39,7 @@ export const query = graphql`
             }
           }
         }
-        fluid(quality: 100) {
-          ...GatsbyContentfulFluid
-        }
+        gatsbyImageData(layout: CONSTRAINED)
         id
       }
       title
@@ -52,9 +60,9 @@ const Columns = styled.div`
   }
 `;
 
-type SelectedImageContainerProps = {
-  maxWidth?: number;
-};
+interface SelectedImageContainerProps {
+  readonly maxWidth?: number;
+}
 
 const SelectedImageContainer = styled.div<SelectedImageContainerProps>`
   display: flex;
@@ -69,10 +77,10 @@ const SelectedImage = styled(GatsbyImage)`
   max-height: 100%;
 `;
 
-type ModalProps = {
-  isVisible?: boolean;
-  maxWidth?: number;
-};
+interface ModalProps {
+  readonly isVisible?: boolean;
+  readonly maxWidth?: number;
+}
 
 const Modal = styled.div<ModalProps>`
   align-items: center;
@@ -136,54 +144,65 @@ const StyledPageButtons = styled(PageButtons)`
   margin-bottom: calc(6 * ${baseline});
 `;
 
-type Image = {
-  description?: string;
-  file: {
-    details: {
-      image: {
-        width: number;
+interface Image {
+  readonly description?: string;
+  readonly file: {
+    readonly details: {
+      readonly image: {
+        readonly width: number;
       };
     };
   };
-  fluid: FluidObject;
-  id: string;
-};
+  readonly gatsbyImageData: IGatsbyImageData;
+  readonly id: string;
+}
 
-type Props = {
-  data: {
-    contentfulImageGallery: {
-      description?: {
-        json: Document;
-      };
-      images: Image[];
-      title: string;
+export interface Props {
+  readonly data: {
+    readonly contentfulImageGallery: {
+      readonly description?: RenderRichTextData<
+        ContentfulRichTextGatsbyReference
+      >;
+      readonly images: readonly Image[];
+      readonly title: string;
     };
   };
-  pageContext: {
-    nextSlug?: string;
-    prevSlug?: string;
+  readonly pageContext: {
+    readonly nextSlug?: string;
+    readonly prevSlug?: string;
   };
-};
+}
 
-const ImageGalleryTemplate: React.FC<Props> = ({ data, pageContext }) => {
+export default function ImageGalleryTemplate(props: Props) {
   const [selectedImage, setSelectedImage] = useState<Image | null>(null);
 
-  const images = data.contentfulImageGallery.images.map(image => (
+  const images = props.data.contentfulImageGallery.images.map(image => (
     <StyledButton key={image.id} onClick={() => setSelectedImage(image)}>
-      <StyledImage alt={image.description ?? ''} fluid={image.fluid} />
+      <StyledImage
+        alt={image.description ?? ''}
+        image={image.gatsbyImageData}
+      />
     </StyledButton>
   ));
 
   return (
     <>
-      <SEO title={data.contentfulImageGallery.title} />
+      <SEO title={props.data.contentfulImageGallery.title} />
       <Layout>
-        <h1>{data.contentfulImageGallery.title}</h1>
-        {data.contentfulImageGallery.description && (
+        <h1>{props.data.contentfulImageGallery.title}</h1>
+        {props.data.contentfulImageGallery.description && (
           <CenteredTextColumn>
-            {documentToReactComponents(
-              data.contentfulImageGallery.description.json
-            )}
+            {renderRichText(props.data.contentfulImageGallery.description, {
+              renderNode: {
+                'embedded-asset-block': node =>
+                  node.data.target.gatsbyImageData ? (
+                    <GatsbyImage
+                      alt={node.data.target.description}
+                      image={node.data.target.gatsbyImageData}
+                    />
+                  ) : null,
+              },
+            })}
           </CenteredTextColumn>
         )}
         <Columns>{images}</Columns>
@@ -196,16 +215,20 @@ const ImageGalleryTemplate: React.FC<Props> = ({ data, pageContext }) => {
             <SelectedImageContainer
               maxWidth={selectedImage.file.details.image.width}
             >
-              <SelectedImage fluid={selectedImage.fluid} objectFit="contain" />
+              <SelectedImage
+                alt={selectedImage.description || ''}
+                image={selectedImage.gatsbyImageData}
+                objectFit="contain"
+              />
             </SelectedImageContainer>
           )}
         </Modal>
         <CenteredTextColumn>
           <ShareSection contentType="image gallery" />
-          {(pageContext.nextSlug || pageContext.prevSlug) && (
+          {(props.pageContext.nextSlug || props.pageContext.prevSlug) && (
             <StyledPageButtons
-              nextSlug={pageContext.nextSlug}
-              prevSlug={pageContext.prevSlug}
+              nextSlug={props.pageContext.nextSlug}
+              prevSlug={props.pageContext.prevSlug}
               rootSlug="images"
             />
           )}
@@ -213,6 +236,4 @@ const ImageGalleryTemplate: React.FC<Props> = ({ data, pageContext }) => {
       </Layout>
     </>
   );
-};
-
-export default ImageGalleryTemplate;
+}

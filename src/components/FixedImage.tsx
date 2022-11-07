@@ -1,46 +1,45 @@
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
-import Image, { FixedObject } from 'gatsby-image';
+import { GatsbyImage, IGatsbyImageData } from 'gatsby-plugin-image';
 import React from 'react';
 import styled from 'styled-components';
 
 import ImagePlaceholderIcon from './ImagePlaceholderIcon';
 import { baseline } from '../style';
 
-const StyledImage = styled(Image)`
+const StyledGatsbyImage = styled(GatsbyImage)`
   border-radius: ${baseline};
 `;
 
-type Props = {
-  className?: string;
-  image?: {
-    description?: string;
-    fixed: FixedObject;
-  };
-  imageWrapperStyle?: object;
-  placeholderIcon: IconProp;
-  placeholderIconSize: string;
-};
+interface Image {
+  readonly description: string;
+  readonly gatsbyImageData: IGatsbyImageData;
+}
 
-const FixedImage: React.FC<Props> = ({
-  className,
-  image,
-  imageWrapperStyle,
-  placeholderIcon,
-  placeholderIconSize,
-}) =>
-  image ? (
-    <StyledImage
-      alt={image.description}
-      className={className}
-      fixed={image.fixed}
-      style={{ ...imageWrapperStyle }}
-    />
-  ) : (
+export interface Props {
+  readonly className?: string;
+  readonly image?: Image;
+  readonly imageWrapperStyle?: object;
+  readonly placeholderIcon: IconProp;
+  readonly placeholderIconSize: string;
+}
+
+export default function FixedImage(props: Props) {
+  if (props.image) {
+    return (
+      <StyledGatsbyImage
+        alt={props.image.description}
+        className={props.className}
+        image={props.image.gatsbyImageData}
+        style={{ ...props.imageWrapperStyle }}
+      />
+    );
+  }
+
+  return (
     <ImagePlaceholderIcon
-      className={className}
-      icon={placeholderIcon}
-      iconSize={placeholderIconSize}
+      className={props.className}
+      icon={props.placeholderIcon}
+      iconSize={props.placeholderIconSize}
     />
   );
-
-export default FixedImage;
+}

@@ -31,24 +31,30 @@ const Content = styled.div`
   max-width: 33rem;
 `;
 
-type Props = {
-  children: React.ReactNode;
-  isShown: boolean;
-  onDismiss: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
-};
+export interface Props {
+  readonly children: React.ReactNode;
+  readonly isShown: boolean;
+  readonly onDismiss: (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => void;
+}
 
-const Modal: React.FC<Props> = ({ children, isShown, onDismiss }) => {
-  useEffect(() => suppressScroll(isShown), [isShown]);
+export default function Modal(props: Props) {
+  useEffect(() => suppressScroll(props.isShown), [props.isShown]);
 
-  return isShown ? (
-    <Shroud>
-      <Window>
-        <Content>{children}</Content>
-        <StyledButton onClick={onDismiss}>Dismiss</StyledButton>
-      </Window>
-    </Shroud>
-  ) : null;
-};
+  if (props.isShown) {
+    return (
+      <Shroud>
+        <Window>
+          <Content>{props.children}</Content>
+          <StyledButton onClick={props.onDismiss}>Dismiss</StyledButton>
+        </Window>
+      </Shroud>
+    );
+  }
+
+  return null;
+}
 
 function suppressScroll(modalIsShown: boolean) {
   const body = document.querySelector('body');
@@ -58,5 +64,3 @@ function suppressScroll(modalIsShown: boolean) {
     return () => body.classList.remove('hide-overflow');
   }
 }
-
-export default Modal;

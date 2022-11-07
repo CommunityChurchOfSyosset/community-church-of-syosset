@@ -4,8 +4,8 @@ import styled from 'styled-components';
 
 import { baseline, color } from '../../../style';
 
-type ContainerProps = {
-  marginBreakpoint: string;
+interface ContainerProps {
+  readonly marginBreakpoint: string;
 }
 
 const Container = styled.div<ContainerProps>`
@@ -18,11 +18,11 @@ const Container = styled.div<ContainerProps>`
   }
 `;
 
-type StyledLinkProps = {
-  paddingBreakpoint: string;
+interface StyledLinkProps {
+  readonly paddingBreakpoint: string;
 }
 
-const StyledLink = styled(Link) <StyledLinkProps>`
+const StyledLink = styled(Link)<StyledLinkProps>`
   transition: filter 500ms;
   width: 100%;
 
@@ -35,16 +35,21 @@ const StyledLink = styled(Link) <StyledLinkProps>`
   }
 `;
 
-type Props = {
-  children: React.ReactNode;
-  className?: string;
-  layoutBreakpoint: string;
-};
+export interface Props {
+  readonly children: React.ReactNode;
+  readonly className?: string;
+  readonly layoutBreakpoint: string;
+}
 
-const Brand: React.FC<Props> = ({ children, className, layoutBreakpoint }) => (
-  <Container className={className} marginBreakpoint={layoutBreakpoint}>
-    <StyledLink paddingBreakpoint={layoutBreakpoint} to="/">{children}</StyledLink>
-  </Container>
-);
-
-export default Brand;
+export default function Brand(props: Props) {
+  return (
+    <Container
+      className={props.className}
+      marginBreakpoint={props.layoutBreakpoint}
+    >
+      <StyledLink paddingBreakpoint={props.layoutBreakpoint} to="/">
+        {props.children}
+      </StyledLink>
+    </Container>
+  );
+}

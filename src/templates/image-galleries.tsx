@@ -1,10 +1,11 @@
 import { graphql } from 'gatsby';
-import { FixedObject } from 'gatsby-image';
 import React from 'react';
 import styled from 'styled-components';
 
 import CenteredTextColumn from '../components/CenteredTextColumn';
-import ImageGalleryCardList from '../components/ImageGalleryCardList';
+import ImageGalleryCardList, {
+  Props as ImageGalleryCardListProps,
+} from '../components/ImageGalleryCardList';
 import Layout from '../components/Layout';
 import Lead from '../components/Lead';
 import Pagination from '../components/Pagination';
@@ -23,9 +24,12 @@ export const query = graphql`
           id
           images {
             description
-            fixed(height: 272, width: 272) {
-              ...GatsbyContentfulFixed
-            }
+            gatsbyImageData(
+              height: 272
+              layout: FIXED
+              quality: 100
+              width: 272
+            )
           }
           slug
           title
@@ -48,31 +52,23 @@ const StyledPagination = styled(Pagination)`
   margin-bottom: calc(6 * ${baseline});
 `;
 
-type Props = {
-  data: {
-    allContentfulImageGallery: {
-      edges: {
-        node: {
-          id: string;
-          images: {
-            description?: string;
-            fixed: FixedObject;
-          }[];
-          slug: string;
-          title: string;
-        };
+export interface Props {
+  readonly data: {
+    readonly allContentfulImageGallery: {
+      readonly edges: readonly {
+        readonly node: ImageGalleryCardListProps['imageGalleries'][number];
       }[];
     };
   };
-  pageContext: {
-    pageIsIndex?: boolean;
-    pageNumber: number;
-    totalPages: number;
+  readonly pageContext: {
+    readonly pageIsIndex?: boolean;
+    readonly pageNumber: number;
+    readonly totalPages: number;
   };
-};
+}
 
-const ImageGalleriesPageTemplate: React.FC<Props> = ({ data, pageContext }) => {
-  const imageGalleries = data.allContentfulImageGallery.edges.map(
+export default function ImageGalleriesPageTemplate(props: Props) {
+  const imageGalleries = props.data.allContentfulImageGallery.edges.map(
     ({ node }) => node
   );
 
@@ -80,22 +76,22 @@ const ImageGalleriesPageTemplate: React.FC<Props> = ({ data, pageContext }) => {
     <>
       <SEO
         title={
-          pageContext.pageIsIndex
+          props.pageContext.pageIsIndex
             ? 'Images'
-            : `Images: Page ${pageContext.pageNumber}`
+            : `Images: Page ${props.pageContext.pageNumber}`
         }
       />
       <Layout>
         <h1>Images</h1>
         <CenteredTextColumn>
-          {pageContext.pageIsIndex ? (
+          {props.pageContext.pageIsIndex ? (
             <>
               <Lead>
                 Want to see what we are all about or revisit a past event?
               </Lead>
             </>
           ) : (
-            <Lead>Page {pageContext.pageNumber}</Lead>
+            <Lead>Page {props.pageContext.pageNumber}</Lead>
           )}
           <p>Click on an gallery to see more images.</p>
         </CenteredTextColumn>
@@ -107,11 +103,11 @@ const ImageGalleriesPageTemplate: React.FC<Props> = ({ data, pageContext }) => {
             Check back soon!
           </NoGalleriesNotice>
         )}
-        {pageContext.totalPages > 1 && (
+        {props.pageContext.totalPages > 1 && (
           <CenteredTextColumn>
             <StyledPagination
-              lastPageNumber={pageContext.totalPages}
-              pageNumber={pageContext.pageNumber}
+              lastPageNumber={props.pageContext.totalPages}
+              pageNumber={props.pageContext.pageNumber}
               urlRoot="images"
             />
           </CenteredTextColumn>
@@ -119,6 +115,4 @@ const ImageGalleriesPageTemplate: React.FC<Props> = ({ data, pageContext }) => {
       </Layout>
     </>
   );
-};
-
-export default ImageGalleriesPageTemplate;
+}

@@ -45,80 +45,67 @@ const Textarea = styled.textarea`
   }
 `;
 
-type OptionalNoticeProps = {
-  className?: string;
-};
-
-const OptionalNotice: React.FC<OptionalNoticeProps> = ({ className }) => (
-  <i className={className}>* optional</i>
-);
-
 const StyledOptionalNotice = styled(OptionalNotice)`
   font-family: ${typography.font.body};
   font-size: ${typography.fontSize.body.xs};
   line-height: ${typography.lineHeight.body.xs};
 `;
 
-type Props = {
-  className?: string;
-  label: string;
-  max?: number;
-  min?: number;
-  name: string;
-  onChange?: (
+export interface Props {
+  readonly className?: string;
+  readonly label: string;
+  readonly max?: number;
+  readonly min?: number;
+  readonly name: string;
+  readonly onChange?: (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => void;
-  pattern?: string;
-  required?: boolean;
-  type: string;
-  value?: string;
-};
+  readonly pattern?: string;
+  readonly required?: boolean;
+  readonly type: string;
+  readonly value?: string;
+}
 
-const FormControl: React.FC<Props> = ({
-  className,
-  label,
-  max,
-  min,
-  name,
-  onChange,
-  pattern,
-  required,
-  type,
-  value,
-}) =>
-  type === 'textarea' ? (
-    <Div className={className}>
-      <Label htmlFor={name}>
-        {label}
-        {required || <StyledOptionalNotice />}
-      </Label>
+export default function FormControl(props: Props) {
+  const control =
+    props.type === 'textarea' ? (
       <Textarea
-        id={name}
-        name={name}
-        onChange={onChange}
-        required={required}
+        id={props.name}
+        name={props.name}
+        onChange={props.onChange}
+        required={props.required}
         spellCheck
-        value={value}
+        value={props.value}
       />
-    </Div>
-  ) : (
-    <Div className={className}>
-      <Label htmlFor={name}>
-        {label}
-        {required || <StyledOptionalNotice />}
-      </Label>
+    ) : (
       <Input
-        id={name}
-        max={max}
-        min={min}
-        name={name}
-        onChange={onChange}
-        pattern={pattern}
-        required={required}
-        type={type}
-        value={value}
+        id={props.name}
+        max={props.max}
+        min={props.min}
+        name={props.name}
+        onChange={props.onChange}
+        pattern={props.pattern}
+        required={props.required}
+        type={props.type}
+        value={props.value}
       />
+    );
+
+  return (
+    <Div className={props.className}>
+      <Label htmlFor={props.name}>
+        {props.label}
+        {props.required || <StyledOptionalNotice />}
+      </Label>
+      {control}
     </Div>
   );
+}
 
-export default FormControl;
+interface OptionalNoticeProps {
+  readonly className?: string;
+}
+
+function OptionalNotice(props: OptionalNoticeProps) {
+  return <i className={props.className}>* optional</i>;
+}
