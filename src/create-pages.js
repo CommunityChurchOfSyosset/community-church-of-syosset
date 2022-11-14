@@ -22,7 +22,7 @@ module.exports = async ({ actions: { createPage }, graphql }) => {
           }
         }
       }
-      allContentfulImageGallery(sort: {fields: title, order: ASC}) {
+      allContentfulImageGallery(sort: { fields: title, order: ASC }) {
         edges {
           next {
             slug
@@ -78,9 +78,11 @@ async function createEventPages(createPage, events) {
   const geocodeDataCache = new Object();
 
   const eventPageCreations = events.map(async event => {
-    const coordinates = `${event.node.location.lat},${event.node.location.lon}`;
+    const coordinates = event.node.location
+      ? `${event.node.location.lat},${event.node.location.lon}`
+      : null;
 
-    if (!geocodeDataCache.hasOwnProperty(coordinates)) {
+    if (coordinates && !geocodeDataCache.hasOwnProperty(coordinates)) {
       geocodeDataCache[coordinates] = await getGeocodeData(coordinates);
     }
 

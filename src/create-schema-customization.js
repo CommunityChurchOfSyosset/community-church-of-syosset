@@ -245,7 +245,7 @@ module.exports = ({ actions: { createTypes } }) => {
     type ContentfulEvent implements Node @derivedTypes @dontInfer {
       title: String!
       date: Date! @dateformat
-      location: ContentfulEventLocation!
+      location: ContentfulEventLocation
       slug: String!
       image: ContentfulAsset @link(by: "id", from: "image___NODE")
       details: ContentfulEventDetails

@@ -109,29 +109,33 @@ export default function EventTemplate(props: Props) {
               </time>
             </p>
           </section>
-          <section>
-            <h2>Location</h2>
-            {process.env.GATSBY_GOOGLE_MAPS_EMBED_API_KEY &&
-              props.pageContext.placeId && (
-                <StyledEmbeddedGoogleMap
-                  apiKey={process.env.GATSBY_GOOGLE_MAPS_EMBED_API_KEY}
-                  aspectRatio={{ x: 1, y: 1 }}
-                  mode="place"
-                  q={`place_id:${props.pageContext.placeId}`}
-                  title="A map of the event location"
-                />
+          {((process.env.GATSBY_GOOGLE_MAPS_EMBED_API_KEY &&
+            props.pageContext.placeId) ||
+            props.pageContext.address) && (
+            <section>
+              <h2>Location</h2>
+              {process.env.GATSBY_GOOGLE_MAPS_EMBED_API_KEY &&
+                props.pageContext.placeId && (
+                  <StyledEmbeddedGoogleMap
+                    apiKey={process.env.GATSBY_GOOGLE_MAPS_EMBED_API_KEY}
+                    aspectRatio={{ x: 1, y: 1 }}
+                    mode="place"
+                    q={`place_id:${props.pageContext.placeId}`}
+                    title="A map of the event location"
+                  />
+                )}
+              {props.pageContext.address && (
+                <p>
+                  {props.pageContext.address.number}{' '}
+                  {props.pageContext.address.street} <br />
+                  {props.pageContext.address.city},{' '}
+                  {props.pageContext.address.state}{' '}
+                  {props.pageContext.address.zip}
+                </p>
               )}
-            {props.pageContext.address && (
-              <p>
-                {props.pageContext.address.number}{' '}
-                {props.pageContext.address.street} <br />
-                {props.pageContext.address.city},{' '}
-                {props.pageContext.address.state}{' '}
-                {props.pageContext.address.zip}
-              </p>
-            )}
-            <address></address>
-          </section>
+              <address></address>
+            </section>
+          )}
           {props.data.contentfulEvent.details && (
             <section>
               <h2>Details</h2>
